@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#059669" />
+      <stop offset="100%" stop-color="#0d9488" />
+    </linearGradient>
+  </defs>
+  <!-- Background Rounded Squircle -->
+  <rect width="512" height="512" rx="128" fill="url(#grad)" />
+  
+  <!-- Scissors Icon White -->
+  <g fill="none" stroke="#ffffff" stroke-width="32" stroke-linecap="round" stroke-linejoin="round" transform="translate(96, 96)">
+    <!-- Scissor blades -->
+    <circle cx="80" cy="80" r="48" />
+    <circle cx="80" cy="240" r="48" />
+    <line x1="114" y1="96" x2="280" y2="240" />
+    <line x1="114" y1="224" x2="280" y2="80" />
+  </g>
+</svg>
