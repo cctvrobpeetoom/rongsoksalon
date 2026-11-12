@@ -651,44 +651,50 @@ export default function SettingsView() {
               <span className="text-[10px] text-slate-400 font-normal">Terkunci ke cabang ini</span>
             </h3>
             <div className="divide-y divide-slate-100">
-              {currentSalonStaff.map((staff) => (
-                <div key={staff.id} className="py-2.5 flex items-center justify-between text-xs">
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <span className="font-bold text-slate-800">{staff.name}</span>
-                      <span className="text-[10px] bg-slate-100 text-slate-600 px-1.5 py-0.2 rounded font-medium">
-                        {staff.role}
-                      </span>
+              {currentSalonStaff.length === 0 ? (
+                <p className="text-xs text-slate-400 italic py-4 text-center">
+                  Belum ada staf terdaftar di {activeSalon.name}. Silakan input staf baru melalui form di atas.
+                </p>
+              ) : (
+                currentSalonStaff.map((staff) => (
+                  <div key={staff.id} className="py-2.5 flex items-center justify-between text-xs">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="font-bold text-slate-800">{staff.name}</span>
+                        <span className="text-[10px] bg-slate-100 text-slate-600 px-1.5 py-0.2 rounded font-medium">
+                          {staff.role}
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-slate-400 mt-0.5 flex items-center gap-1.5">
+                        <Key className="w-3 h-3 text-emerald-600" />
+                        User: <span className="font-mono text-slate-600">{staff.username || staff.name.toLowerCase().replace(/\s+/g, '')}</span>
+                        <span>•</span>
+                        PIN: <span className="font-mono text-slate-600">{staff.pin || '1234'}</span>
+                      </p>
                     </div>
-                    <p className="text-[11px] text-slate-400 mt-0.5 flex items-center gap-1.5">
-                      <Key className="w-3 h-3 text-emerald-600" />
-                      User: <span className="font-mono text-slate-600">{staff.username || staff.name.toLowerCase().replace(/\s+/g, '')}</span>
-                      <span>•</span>
-                      PIN: <span className="font-mono text-slate-600">{staff.pin || '1234'}</span>
-                    </p>
+                    <div className="flex items-center gap-1">
+                      <button
+                        type="button"
+                        onClick={() => setEditingStaff(staff)}
+                        className="text-slate-400 hover:text-emerald-700 p-1"
+                        title="Edit Staf"
+                      >
+                        <Edit2 className="w-3.5 h-3.5" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (confirm(`Hapus staf "${staff.name}" dari sistem?`)) deleteStaff(staff.id);
+                        }}
+                        className="text-slate-400 hover:text-red-500 p-1"
+                        title="Hapus Staf"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-1">
-                    <button
-                      type="button"
-                      onClick={() => setEditingStaff(staff)}
-                      className="text-slate-400 hover:text-emerald-700 p-1"
-                      title="Edit Staf"
-                    >
-                      <Edit2 className="w-3.5 h-3.5" />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        if (confirm(`Hapus staf "${staff.name}" dari sistem?`)) deleteStaff(staff.id);
-                      }}
-                      className="text-slate-400 hover:text-red-500 p-1"
-                      title="Hapus Staf"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                </div>
-              ))}
+                ))
+              )}
             </div>
           </div>
 

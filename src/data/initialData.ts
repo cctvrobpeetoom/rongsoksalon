@@ -1,13 +1,8 @@
 import { Salon, Area, Staff, Product, RongsokTransaction, User } from '@/types';
 
 export const INITIAL_USERS: (User & { pin: string })[] = [
-  { id: 'usr-admin', username: 'admin', pin: 'admin123', name: 'Super Admin Salon', role: 'superadmin' },
-  { id: 'usr-budi', username: 'budi', pin: '1234', name: 'Budi Santoso', role: 'staff', assignedSalonId: 'seminyak' },
-  { id: 'usr-dewi', username: 'dewi', pin: '1234', name: 'Dewi Lestari', role: 'staff', assignedSalonId: 'seminyak' },
-  { id: 'usr-agus', username: 'agus', pin: '1234', name: 'Agus Pratama', role: 'staff', assignedSalonId: 'seminyak' },
-  { id: 'usr-michael', username: 'michael', pin: '1234', name: 'Michael Lee', role: 'staff', assignedSalonId: 'canggu' },
-  { id: 'usr-ketut', username: 'ketut', pin: '1234', name: 'Ketut Suardika', role: 'staff', assignedSalonId: 'ubud' },
-  { id: 'usr-komang', username: 'komang', pin: '1234', name: 'Komang Krisna', role: 'staff', assignedSalonId: 'sanur' },
+  { id: 'usr-admin', username: 'admin', pin: 'Petitenget16', name: 'Super Admin Salon', role: 'superadmin' },
+  { id: 'usr-admin-2', username: 'admin', pin: 'sigitlapar', name: 'Super Admin', role: 'superadmin' },
 ];
 
 export const INITIAL_SALONS: Salon[] = [
@@ -66,35 +61,8 @@ export const INITIAL_AREAS: Area[] = [
   { id: 'ulw-tar-2', salonId: 'uluwatu', name: 'Cliffside Spa', type: 'taruh' },
 ];
 
-export const INITIAL_STAFF: Staff[] = [
-  // Seminyak
-  { id: 'stf-sem-1', salonId: 'seminyak', name: 'Budi Santoso', role: 'Senior Stylist', isActive: true },
-  { id: 'stf-sem-2', salonId: 'seminyak', name: 'Dewi Lestari', role: 'Colorist', isActive: true },
-  { id: 'stf-sem-3', salonId: 'seminyak', name: 'Agus Pratama', role: 'Barber', isActive: true },
-  { id: 'stf-sem-4', salonId: 'seminyak', name: 'Siti Rahma', role: 'Hairspa Therapist', isActive: true },
-
-  // Canggu
-  { id: 'stf-cng-1', salonId: 'canggu', name: 'Michael Lee', role: 'Artistic Director', isActive: true },
-  { id: 'stf-cng-2', salonId: 'canggu', name: 'Putu Ayu', role: 'Stylist', isActive: true },
-  { id: 'stf-cng-3', salonId: 'canggu', name: 'Wayan Kevin', role: 'Barber', isActive: true },
-
-  // Ubud
-  { id: 'stf-ubd-1', salonId: 'ubud', name: 'Ketut Suardika', role: 'Senior Therapist', isActive: true },
-  { id: 'stf-ubd-2', salonId: 'ubud', name: 'Made Wardani', role: 'Stylist', isActive: true },
-
-  // Sanur
-  { id: 'stf-snr-1', salonId: 'sanur', name: 'Komang Krisna', role: 'Stylist', isActive: true },
-  { id: 'stf-snr-2', salonId: 'sanur', name: 'Ni Luh Sari', role: 'Color Specialist', isActive: true },
-
-  // Kuta
-  { id: 'stf-kta-1', salonId: 'kuta', name: 'Doni Firmansyah', role: 'Barber & Stylist', isActive: true },
-
-  // Jimbaran
-  { id: 'stf-jmb-1', salonId: 'jimbaran', name: 'Ilham Jaya', role: 'Hair Therapist', isActive: true },
-
-  // Uluwatu
-  { id: 'stf-ulw-1', salonId: 'uluwatu', name: 'Rendra Wijaya', role: 'Senior Stylist', isActive: true },
-];
+// Daftar staf awal dikosongkan agar admin menginput ulang seluruh staf secara mandiri
+export const INITIAL_STAFF: Staff[] = [];
 
 export const INITIAL_PRODUCTS: Product[] = [
   // Salon Seminyak (Katalog Khusus Seminyak)
@@ -144,6 +112,10 @@ const generateInitialTransactions = (): RongsokTransaction[] => {
   const ambil = INITIAL_AREAS.filter((a) => a.salonId === 'seminyak' && a.type === 'ambil');
   const taruh = INITIAL_AREAS.filter((a) => a.salonId === 'seminyak' && a.type === 'taruh');
   const seminyakProducts = INITIAL_PRODUCTS.filter((p) => p.salonId === 'seminyak');
+
+  if (staff.length === 0 || ambil.length === 0 || taruh.length === 0 || seminyakProducts.length === 0) {
+    return [];
+  }
 
   const dates = [
     '2026-11-10', '2026-11-10', '2026-11-09', '2026-11-09', '2026-11-09',

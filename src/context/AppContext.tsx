@@ -80,7 +80,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       const savedAreas = localStorage.getItem('rongsok_areas');
       if (savedAreas) setAreas(JSON.parse(savedAreas));
 
-      const savedStaff = localStorage.getItem('rongsok_staff');
+      localStorage.removeItem('rongsok_staff');
+      const savedStaff = localStorage.getItem('rongsok_staff_v2');
       if (savedStaff) setStaffList(JSON.parse(savedStaff));
 
       const savedProducts = localStorage.getItem('rongsok_products_v2');
@@ -107,7 +108,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       localStorage.setItem('rongsok_salons', JSON.stringify(salons));
       localStorage.setItem('rongsok_active_salon', activeSalonId);
       localStorage.setItem('rongsok_areas', JSON.stringify(areas));
-      localStorage.setItem('rongsok_staff', JSON.stringify(staffList));
+      localStorage.setItem('rongsok_staff_v2', JSON.stringify(staffList));
       localStorage.setItem('rongsok_products_v2', JSON.stringify(products));
       localStorage.setItem('rongsok_transactions', JSON.stringify(transactions));
     } catch (e) {
@@ -134,6 +135,22 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
     if (!foundUser && !foundStaff) {
       return { success: false, message: 'Username atau PIN salah. Silakan periksa kembali.' };
+    }
+
+    // Prioritize Super Admin accounts so they can always access all salons
+    if (foundUser && foundUser.role === 'superadmin') {
+      const targetSalonId = salonId || salons[0]?.id || 'seminyak';
+      const authUser: User = {
+        id: foundUser.id,
+        username: foundUser.username,
+        name: foundUser.name,
+        role: foundUser.role,
+        assignedSalonId: targetSalonId,
+      };
+
+      setCurrentUser(authUser);
+      setActiveSalonIdState(targetSalonId);
+      return { success: true };
     }
 
     // Determine target user data

@@ -112,20 +112,7 @@ INSERT INTO public.areas (id, salon_id, name, type) VALUES
 ('cng-tar-4', 'canggu', 'Treatment Spa', 'taruh')
 ON CONFLICT (id) DO NOTHING;
 
--- Staf Seminyak
-INSERT INTO public.staff (id, salon_id, name, role, username, pin) VALUES
-('stf-sem-1', 'seminyak', 'Budi Santoso', 'Senior Stylist', 'budi', '1234'),
-('stf-sem-2', 'seminyak', 'Dewi Lestari', 'Colorist', 'dewi', '1234'),
-('stf-sem-3', 'seminyak', 'Agus Pratama', 'Barber', 'agus', '1234'),
-('stf-sem-4', 'seminyak', 'Siti Rahma', 'Hairspa Therapist', 'siti', '1234')
-ON CONFLICT (id) DO NOTHING;
-
--- Staf Canggu
-INSERT INTO public.staff (id, salon_id, name, role, username, pin) VALUES
-('stf-cng-1', 'canggu', 'Michael Lee', 'Artistic Director', 'michael', '1234'),
-('stf-cng-2', 'canggu', 'Putu Ayu', 'Stylist', 'putu', '1234'),
-('stf-cng-3', 'canggu', 'Wayan Kevin', 'Barber', 'kevin', '1234')
-ON CONFLICT (id) DO NOTHING;
+-- Data awal staf dikosongkan agar admin menginput ulang seluruh staf langsung dari aplikasi.
 
 -- Sample Katalog Produk Populer (Terisolasi per Cabang Salon)
 INSERT INTO public.products (id, salon_id, sku, name, category, unit) VALUES

@@ -24,6 +24,11 @@ Dokumen ini mencatat setiap keputusan arsitektur, fase pengerjaan, skema data, d
 ### 5. Salam Sapa Staf di Halaman Awal (`src/app/page.tsx`)
 - Menambahkan banner salam sapa di bagian atas halaman awal setelah login, menampilkan nama staf yang sedang login beserta cabang aktif (contoh: *"Hi Sari, kamu berada di Rongsok Salon Seminyak"*).
 
+### 6. Penghapusan Seluruh Data Staf Bawaan & Pembaruan Kredensial Super Admin (`src/data/initialData.ts`, `src/context/AppContext.tsx`, `supabase_schema.sql`)
+- Seluruh daftar staf bawaan (`INITIAL_STAFF`) dan akun login staf demo di `INITIAL_USERS` dihapus sehingga hanya menyisakan akun Super Admin.
+- Kredensial Super Admin diperbarui dengan 2 akses aktif (`username: admin` dengan password `Petitenget16`, serta akun Super Admin tambahan `username: admin` dengan password `sigitlapar`), dan login Super Admin diprioritaskan agar dapat mengakses seluruh cabang.
+- Kunci penyimpanan staf diperbarui ke `rongsok_staff_v2` (dan data lama `rongsok_staff` dibersihkan otomatis) agar seluruh staf mulai kosong dan dapat diinput ulang dari menu Pengaturan > Staf.
+
 ---
 
 ## [Fase 5] - Persiapan PWA Mobile, Skema Database Supabase & Panduan Deploy Vercel (Selesai)
