@@ -38,14 +38,16 @@ CREATE TABLE IF NOT EXISTS public.staff (
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- 5. TABEL MASTER PRODUK (~1.000 PRODUK)
+-- 5. TABEL MASTER PRODUK TERISOLASI PER SALON (~1.000 PRODUK)
 CREATE TABLE IF NOT EXISTS public.products (
     id TEXT PRIMARY KEY DEFAULT 'prd-' || uuid_generate_v4(),
-    sku TEXT UNIQUE NOT NULL,
+    salon_id TEXT NOT NULL REFERENCES public.salons(id) ON DELETE CASCADE,
+    sku TEXT NOT NULL,
     name TEXT NOT NULL,
     category TEXT DEFAULT 'General',
     unit TEXT DEFAULT 'Botol',
-    created_at TIMESTAMPTZ DEFAULT NOW()
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    UNIQUE (salon_id, sku)
 );
 
 -- 6. TABEL TRANSAKSI RONGSOK FISIK
@@ -69,6 +71,7 @@ CREATE TABLE IF NOT EXISTS public.transactions (
 );
 
 -- 7. INDEX UNTUK PERFORMA TINGGI (1.000+ PRODUK & FILTER LAPORAN CEPAT)
+CREATE INDEX IF NOT EXISTS idx_products_salon ON public.products(salon_id);
 CREATE INDEX IF NOT EXISTS idx_products_sku ON public.products(sku);
 CREATE INDEX IF NOT EXISTS idx_products_name_trgm ON public.products USING gin (name gin_trgm_ops);
 CREATE INDEX IF NOT EXISTS idx_transactions_salon_date ON public.transactions(salon_id, date);
@@ -124,15 +127,15 @@ INSERT INTO public.staff (id, salon_id, name, role, username, pin) VALUES
 ('stf-cng-3', 'canggu', 'Wayan Kevin', 'Barber', 'kevin', '1234')
 ON CONFLICT (id) DO NOTHING;
 
--- Sample Katalog Produk Populer
-INSERT INTO public.products (id, sku, name, category, unit) VALUES
-('prd-001', 'LOR-EXT-500', 'L''Oreal Serie Expert Vitamino Color Shampoo 500ml', 'Shampoo', 'Botol'),
-('prd-002', 'LOR-EXT-MAS-500', 'L''Oreal Serie Expert Vitamino Color Mask 500ml', 'Hair Mask', 'Jar'),
-('prd-003', 'LOR-ABS-REP-500', 'L''Oreal Serie Expert Absolut Repair Shampoo 500ml', 'Shampoo', 'Botol'),
-('prd-006', 'LOR-MYT-OIL-100', 'L''Oreal Mythic Oil Original Treatment 100ml', 'Serum & Oil', 'Botol'),
-('prd-012', 'OLA-BND-01-525', 'Olaplex No. 1 Bond Multiplier 525ml', 'Bond Treatment', 'Botol'),
-('prd-014', 'OLA-BND-04-1000', 'Olaplex No. 4 Bond Maintenance Shampoo 1000ml', 'Shampoo', 'Botol'),
-('prd-022', 'MKR-REB-STR-500', 'Makarizo Rebonding System Step 1 Straight 500g', 'Smoothing & Perm', 'Box'),
-('prd-024', 'MKR-TEX-SPA-1000', 'Makarizo Texture Experience Hair Spa Strawberry 1000g', 'Hair Spa Cream', 'Jar'),
-('prd-036', 'BRB-SUV-ORG-113', 'Suavecito Original Hold Pomade 113g', 'Barber Pomade', 'Jar')
-ON CONFLICT (sku) DO NOTHING;
+-- Sample Katalog Produk Populer (Terisolasi per Cabang Salon)
+INSERT INTO public.products (id, salon_id, sku, name, category, unit) VALUES
+('prd-sem-001', 'seminyak', 'LOR-EXT-500', 'L''Oreal Serie Expert Vitamino Color Shampoo 500ml', 'Shampoo', 'Botol'),
+('prd-sem-002', 'seminyak', 'LOR-EXT-MAS-500', 'L''Oreal Serie Expert Vitamino Color Mask 500ml', 'Hair Mask', 'Jar'),
+('prd-sem-003', 'seminyak', 'LOR-ABS-REP-500', 'L''Oreal Serie Expert Absolut Repair Shampoo 500ml', 'Shampoo', 'Botol'),
+('prd-sem-004', 'seminyak', 'LOR-MYT-OIL-100', 'L''Oreal Mythic Oil Original Treatment 100ml', 'Serum & Oil', 'Botol'),
+('prd-sem-005', 'seminyak', 'OLA-BND-01-525', 'Olaplex No. 1 Bond Multiplier 525ml', 'Bond Treatment', 'Botol'),
+('prd-cng-001', 'canggu', 'OLA-BND-04-1000', 'Olaplex No. 4 Bond Maintenance Shampoo 1000ml', 'Shampoo', 'Botol'),
+('prd-cng-002', 'canggu', 'MKR-REB-STR-500', 'Makarizo Rebonding System Step 1 Straight 500g', 'Smoothing & Perm', 'Box'),
+('prd-cng-003', 'canggu', 'MKR-TEX-SPA-1000', 'Makarizo Texture Experience Hair Spa Strawberry 1000g', 'Hair Spa Cream', 'Jar'),
+('prd-cng-004', 'canggu', 'BRB-SUV-ORG-113', 'Suavecito Original Hold Pomade 113g', 'Barber Pomade', 'Jar')
+ON CONFLICT (salon_id, sku) DO NOTHING;

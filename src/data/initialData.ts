@@ -97,59 +97,45 @@ export const INITIAL_STAFF: Staff[] = [
 ];
 
 export const INITIAL_PRODUCTS: Product[] = [
-  // L'Oreal Professionnel
-  { id: 'prd-001', sku: 'LOR-EXT-500', name: "L'Oreal Serie Expert Vitamino Color Shampoo 500ml", category: 'Shampoo', unit: 'Botol' },
-  { id: 'prd-002', sku: 'LOR-EXT-MAS-500', name: "L'Oreal Serie Expert Vitamino Color Mask 500ml", category: 'Hair Mask', unit: 'Jar' },
-  { id: 'prd-003', sku: 'LOR-ABS-REP-500', name: "L'Oreal Serie Expert Absolut Repair Shampoo 500ml", category: 'Shampoo', unit: 'Botol' },
-  { id: 'prd-004', sku: 'LOR-ABS-REP-MAS-500', name: "L'Oreal Serie Expert Absolut Repair Mask 500ml", category: 'Hair Mask', unit: 'Jar' },
-  { id: 'prd-005', sku: 'LOR-SIL-500', name: "L'Oreal Serie Expert Silver Shampoo Anti-Kuning 500ml", category: 'Shampoo', unit: 'Botol' },
-  { id: 'prd-006', sku: 'LOR-MYT-OIL-100', name: "L'Oreal Mythic Oil Original Treatment 100ml", category: 'Serum & Oil', unit: 'Botol' },
-  { id: 'prd-007', sku: 'LOR-MAJ-COL-1', name: "L'Oreal Majirel Permanent Color No. 1 Hitam Alami 50ml", category: 'Hair Color', unit: 'Tube' },
-  { id: 'prd-008', sku: 'LOR-MAJ-COL-5', name: "L'Oreal Majirel Permanent Color No. 5 Light Brown 50ml", category: 'Hair Color', unit: 'Tube' },
-  { id: 'prd-009', sku: 'LOR-MAJ-COL-7', name: "L'Oreal Majirel Permanent Color No. 7.1 Blonde Ash 50ml", category: 'Hair Color', unit: 'Tube' },
-  { id: 'prd-010', sku: 'LOR-OXI-20V-1000', name: "L'Oreal Oxydant Creme 6% (20 Volume) 1000ml", category: 'Developer', unit: 'Botol' },
-  { id: 'prd-011', sku: 'LOR-OXI-30V-1000', name: "L'Oreal Oxydant Creme 9% (30 Volume) 1000ml", category: 'Developer', unit: 'Botol' },
+  // Salon Seminyak (Katalog Khusus Seminyak)
+  { id: 'prd-sem-001', salonId: 'seminyak', sku: 'LOR-EXT-500', name: "L'Oreal Serie Expert Vitamino Color Shampoo 500ml", category: 'Shampoo', unit: 'Botol' },
+  { id: 'prd-sem-002', salonId: 'seminyak', sku: 'LOR-EXT-MAS-500', name: "L'Oreal Serie Expert Vitamino Color Mask 500ml", category: 'Hair Mask', unit: 'Jar' },
+  { id: 'prd-sem-003', salonId: 'seminyak', sku: 'LOR-ABS-REP-500', name: "L'Oreal Serie Expert Absolut Repair Shampoo 500ml", category: 'Shampoo', unit: 'Botol' },
+  { id: 'prd-sem-004', salonId: 'seminyak', sku: 'LOR-MYT-OIL-100', name: "L'Oreal Mythic Oil Original Treatment 100ml", category: 'Serum & Oil', unit: 'Botol' },
+  { id: 'prd-sem-005', salonId: 'seminyak', sku: 'LOR-OXI-20V-1000', name: "L'Oreal Oxydant Creme 6% (20 Volume) 1000ml", category: 'Developer', unit: 'Botol' },
+  { id: 'prd-sem-006', salonId: 'seminyak', sku: 'OLA-BND-01-525', name: 'Olaplex No. 1 Bond Multiplier 525ml', category: 'Bond Treatment', unit: 'Botol' },
+  { id: 'prd-sem-007', salonId: 'seminyak', sku: 'OLA-BND-02-525', name: 'Olaplex No. 2 Bond Perfector 525ml', category: 'Bond Treatment', unit: 'Botol' },
+  { id: 'prd-sem-008', salonId: 'seminyak', sku: 'MKR-TEX-SPA-1000', name: 'Makarizo Texture Experience Hair Spa Strawberry 1000g', category: 'Hair Spa Cream', unit: 'Jar' },
+  { id: 'prd-sem-009', salonId: 'seminyak', sku: 'BRB-SUV-ORG-113', name: 'Suavecito Original Hold Pomade 113g', category: 'Barber Pomade', unit: 'Jar' },
+  { id: 'prd-sem-010', salonId: 'seminyak', sku: 'BRB-PRO-SHV-500', name: 'Proraso Shaving Cream Eucalyptus & Menthol 500ml', category: 'Shaving Cream', unit: 'Tube' },
 
-  // Olaplex
-  { id: 'prd-012', sku: 'OLA-BND-01-525', name: 'Olaplex No. 1 Bond Multiplier 525ml', category: 'Bond Treatment', unit: 'Botol' },
-  { id: 'prd-013', sku: 'OLA-BND-02-525', name: 'Olaplex No. 2 Bond Perfector 525ml', category: 'Bond Treatment', unit: 'Botol' },
-  { id: 'prd-014', sku: 'OLA-BND-04-1000', name: 'Olaplex No. 4 Bond Maintenance Shampoo 1000ml', category: 'Shampoo', unit: 'Botol' },
-  { id: 'prd-015', sku: 'OLA-BND-05-1000', name: 'Olaplex No. 5 Bond Maintenance Conditioner 1000ml', category: 'Conditioner', unit: 'Botol' },
-  { id: 'prd-016', sku: 'OLA-BND-07-30', name: 'Olaplex No. 7 Bonding Oil 30ml', category: 'Serum & Oil', unit: 'Botol' },
+  // Salon Canggu (Katalog Khusus Canggu - Berbeda dari Seminyak)
+  { id: 'prd-cng-001', salonId: 'canggu', sku: 'KRS-BN-CHRO-1000', name: 'Kerastase Bain Chroma Respect Shampoo 1000ml', category: 'Shampoo', unit: 'Botol' },
+  { id: 'prd-cng-002', salonId: 'canggu', sku: 'KRS-MSK-CHRO-500', name: 'Kerastase Masque Chroma Filler 500ml', category: 'Hair Mask', unit: 'Jar' },
+  { id: 'prd-cng-003', salonId: 'canggu', sku: 'KRS-ELX-ULT-100', name: 'Kerastase Elixir Ultime Hair Oil 100ml', category: 'Serum & Oil', unit: 'Botol' },
+  { id: 'prd-cng-004', salonId: 'canggu', sku: 'SCW-OSI-DUST-10', name: 'Schwarzkopf OSiS+ Dust It Mattifying Powder 10g', category: 'Barber Styling', unit: 'Botol' },
+  { id: 'prd-cng-005', salonId: 'canggu', sku: 'BRB-UPP-MAT-100', name: 'Uppercut Deluxe Matt Clay 100g', category: 'Barber Pomade', unit: 'Jar' },
 
-  // Kerastase
-  { id: 'prd-017', sku: 'KRS-BN-CHRO-1000', name: 'Kerastase Bain Chroma Respect Shampoo 1000ml', category: 'Shampoo', unit: 'Botol' },
-  { id: 'prd-018', sku: 'KRS-BN-DIV-1000', name: 'Kerastase Bain Densifique Shampoo 1000ml', category: 'Shampoo', unit: 'Botol' },
-  { id: 'prd-019', sku: 'KRS-MSK-CHRO-500', name: 'Kerastase Masque Chroma Filler 500ml', category: 'Hair Mask', unit: 'Jar' },
-  { id: 'prd-020', sku: 'KRS-ELX-ULT-100', name: 'Kerastase Elixir Ultime L’Huile Original Hair Oil 100ml', category: 'Serum & Oil', unit: 'Botol' },
-  { id: 'prd-021', sku: 'KRS-FUS-AMP-12', name: 'Kerastase Fusio-Dose Concentre Booster 12ml', category: 'Treatment Ampoule', unit: 'Ampul' },
+  // Salon Ubud (Katalog Khusus Ubud)
+  { id: 'prd-ubd-001', salonId: 'ubud', sku: 'MKR-REB-STR-500', name: 'Makarizo Rebonding System Step 1 Straight 500g', category: 'Smoothing & Perm', unit: 'Box' },
+  { id: 'prd-ubd-002', salonId: 'ubud', sku: 'MKR-TEX-SPA-MNT-1000', name: 'Makarizo Texture Experience Hair Spa Mint 1000g', category: 'Hair Spa Cream', unit: 'Jar' },
+  { id: 'prd-ubd-003', salonId: 'ubud', sku: 'MTX-BIO-SMP-1000', name: 'Matrix Biolage ScalpSync Anti-Dandruff Shampoo 1000ml', category: 'Shampoo', unit: 'Botol' },
 
-  // Makarizo Professional
-  { id: 'prd-022', sku: 'MKR-REB-STR-500', name: 'Makarizo Rebonding System Step 1 Straight 500g', category: 'Smoothing & Perm', unit: 'Box' },
-  { id: 'prd-023', sku: 'MKR-REB-NTL-500', name: 'Makarizo Rebonding Neutralizer Step 2 500g', category: 'Smoothing & Perm', unit: 'Box' },
-  { id: 'prd-024', sku: 'MKR-TEX-SPA-1000', name: 'Makarizo Texture Experience Hair Spa Strawberry 1000g', category: 'Hair Spa Cream', unit: 'Jar' },
-  { id: 'prd-025', sku: 'MKR-TEX-SPA-MNT-1000', name: 'Makarizo Texture Experience Hair Spa Mint 1000g', category: 'Hair Spa Cream', unit: 'Jar' },
-  { id: 'prd-026', sku: 'MKR-ENR-NUT-100', name: 'Makarizo Hair Energy Scentsations Ocean Breeze 100ml', category: 'Hair Perfume', unit: 'Botol' },
+  // Salon Sanur (Katalog Khusus Sanur)
+  { id: 'prd-snr-001', salonId: 'sanur', sku: 'WEL-KOL-PER-60', name: 'Wella Koleston Perfect Me+ Pure Naturals 60ml', category: 'Hair Color', unit: 'Tube' },
+  { id: 'prd-snr-002', salonId: 'sanur', sku: 'WEL-EIMI-SPR-500', name: 'Wella EIMI Super Set Finishing Spray 500ml', category: 'Styling Spray', unit: 'Kaleng' },
 
-  // Matrix Professional
-  { id: 'prd-027', sku: 'MTX-WND-BRN-60', name: 'Matrix Wonder Brown Hair Dye 7.3 Dark Golden Brown 60ml', category: 'Hair Color', unit: 'Tube' },
-  { id: 'prd-028', sku: 'MTX-OPT-SMO-400', name: 'Matrix Opti.Straight Resistant Cream Step 1 400ml', category: 'Smoothing & Perm', unit: 'Pouch' },
-  { id: 'prd-029', sku: 'MTX-OPT-NTL-400', name: 'Matrix Opti.Straight Conditioning Neutralizer 400ml', category: 'Smoothing & Perm', unit: 'Pouch' },
-  { id: 'prd-030', sku: 'MTX-BIO-SMP-1000', name: 'Matrix Biolage ScalpSync Anti-Dandruff Shampoo 1000ml', category: 'Shampoo', unit: 'Botol' },
+  // Salon Kuta (Katalog Khusus Kuta)
+  { id: 'prd-kta-001', salonId: 'kuta', sku: 'BRB-SUV-FIR-113', name: 'Suavecito Firme (Strong) Hold Pomade 113g', category: 'Barber Pomade', unit: 'Jar' },
+  { id: 'prd-kta-002', salonId: 'kuta', sku: 'BRB-PRO-AFT-400', name: 'Proraso After Shave Lotion Refreshing 400ml', category: 'After Shave', unit: 'Botol' },
 
-  // Wella & Schwarzkopf
-  { id: 'prd-031', sku: 'WEL-KOL-PER-60', name: 'Wella Koleston Perfect Me+ Pure Naturals 60ml', category: 'Hair Color', unit: 'Tube' },
-  { id: 'prd-032', sku: 'WEL-EIMI-SPR-500', name: 'Wella EIMI Super Set Extra Strong Finishing Spray 500ml', category: 'Styling Spray', unit: 'Kaleng' },
-  { id: 'prd-033', sku: 'SCW-OSI-DUST-10', name: 'Schwarzkopf OSiS+ Dust It Mattifying Powder 10g', category: 'Barber Styling', unit: 'Botol' },
-  { id: 'prd-034', sku: 'SCW-BLD-ME-450', name: 'Schwarzkopf BLONDME Premium Lightener 9+ 450g', category: 'Bleaching Powder', unit: 'Jar' },
-  { id: 'prd-035', sku: 'SCW-SIL-SMP-1000', name: 'Schwarzkopf Goodbye Yellow Neutralizing Wash 1000ml', category: 'Shampoo', unit: 'Botol' },
+  // Salon Jimbaran (Katalog Khusus Jimbaran)
+  { id: 'prd-jmb-001', salonId: 'jimbaran', sku: 'MTX-WND-BRN-60', name: 'Matrix Wonder Brown Hair Dye 7.3 60ml', category: 'Hair Color', unit: 'Tube' },
+  { id: 'prd-jmb-002', salonId: 'jimbaran', sku: 'MTX-OPT-SMO-400', name: 'Matrix Opti.Straight Cream Step 1 400ml', category: 'Smoothing & Perm', unit: 'Pouch' },
 
-  // Barber Products
-  { id: 'prd-036', sku: 'BRB-SUV-ORG-113', name: 'Suavecito Original Hold Pomade 113g', category: 'Barber Pomade', unit: 'Jar' },
-  { id: 'prd-037', sku: 'BRB-SUV-FIR-113', name: 'Suavecito Firme (Strong) Hold Pomade 113g', category: 'Barber Pomade', unit: 'Jar' },
-  { id: 'prd-038', sku: 'BRB-UPP-MAT-100', name: 'Uppercut Deluxe Matt Clay 100g', category: 'Barber Pomade', unit: 'Jar' },
-  { id: 'prd-039', sku: 'BRB-PRO-SHV-500', name: 'Proraso Shaving Cream Eucalyptus & Menthol 500ml', category: 'Shaving Cream', unit: 'Tube' },
-  { id: 'prd-040', sku: 'BRB-PRO-AFT-400', name: 'Proraso After Shave Lotion Refreshing 400ml', category: 'After Shave', unit: 'Botol' },
+  // Salon Uluwatu (Katalog Khusus Uluwatu)
+  { id: 'prd-ulw-001', salonId: 'uluwatu', sku: 'OLA-BND-04-1000', name: 'Olaplex No. 4 Bond Maintenance Shampoo 1000ml', category: 'Shampoo', unit: 'Botol' },
+  { id: 'prd-ulw-002', salonId: 'uluwatu', sku: 'OLA-BND-05-1000', name: 'Olaplex No. 5 Bond Maintenance Conditioner 1000ml', category: 'Conditioner', unit: 'Botol' },
 ];
 
 // Generate 32 sample transactions across different dates to test pagination (20 items/page) and date filter
@@ -157,6 +143,7 @@ const generateInitialTransactions = (): RongsokTransaction[] => {
   const staff = INITIAL_STAFF.filter((s) => s.salonId === 'seminyak');
   const ambil = INITIAL_AREAS.filter((a) => a.salonId === 'seminyak' && a.type === 'ambil');
   const taruh = INITIAL_AREAS.filter((a) => a.salonId === 'seminyak' && a.type === 'taruh');
+  const seminyakProducts = INITIAL_PRODUCTS.filter((p) => p.salonId === 'seminyak');
 
   const dates = [
     '2026-11-10', '2026-11-10', '2026-11-09', '2026-11-09', '2026-11-09',
@@ -169,7 +156,7 @@ const generateInitialTransactions = (): RongsokTransaction[] => {
   ];
 
   return dates.map((date, idx) => {
-    const prod = INITIAL_PRODUCTS[idx % INITIAL_PRODUCTS.length];
+    const prod = seminyakProducts[idx % seminyakProducts.length];
     const stf = staff[idx % staff.length];
     const src = ambil[idx % ambil.length];
     const trg = taruh[(idx * 2) % taruh.length];

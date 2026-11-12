@@ -37,8 +37,8 @@ export default function InputForm() {
     activeSalon,
     currentSalonStaff,
     currentSalonAreas,
+    currentSalonProducts,
     currentSalonTransactions,
-    products,
     addTransaction,
     currentUser,
   } = useApp();
@@ -74,28 +74,24 @@ export default function InputForm() {
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  // Auto-set staff if currentUser is a staff member
+  // Auto-set staff and reset selections when active salon changes
   useEffect(() => {
+    setSelectedProduct(null);
+    setBatchItems([]);
+    setSearchQuery('');
+
     if (currentUser?.role === 'staff') {
       const matchStaff = currentSalonStaff.find(
         (s) => s.name.toLowerCase() === currentUser.name.toLowerCase() ||
                (s.username && s.username.toLowerCase() === currentUser.username.toLowerCase())
       );
-      if (matchStaff) {
-        setStaffId(matchStaff.id);
-      } else if (currentSalonStaff.length > 0) {
-        setStaffId(currentSalonStaff[0].id);
-      }
-    } else if (currentSalonStaff.length > 0 && !staffId) {
-      setStaffId(currentSalonStaff[0].id);
+      setStaffId(matchStaff ? matchStaff.id : (currentSalonStaff[0]?.id || ''));
+    } else {
+      setStaffId(currentSalonStaff[0]?.id || '');
     }
 
-    if (ambilAreas.length > 0 && !sourceAreaId) {
-      setSourceAreaId(ambilAreas[0].id);
-    }
-    if (taruhAreas.length > 0 && !targetAreaId) {
-      setTargetAreaId(taruhAreas[0].id);
-    }
+    setSourceAreaId(ambilAreas[0]?.id || '');
+    setTargetAreaId(taruhAreas[0]?.id || '');
   }, [activeSalon.id, currentSalonStaff, ambilAreas, taruhAreas, currentUser]);
 
   // Close search dropdown on click outside
@@ -109,14 +105,14 @@ export default function InputForm() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Filtered products (instant search matching name or SKU)
+  // Filtered products (instant search matching name or SKU strictly within current salon)
   const filteredProducts = useMemo(() => {
-    if (!searchQuery.trim()) return products.slice(0, 15);
+    if (!searchQuery.trim()) return currentSalonProducts.slice(0, 15);
     const query = searchQuery.toLowerCase().trim();
-    return products
+    return currentSalonProducts
       .filter((p) => p.name.toLowerCase().includes(query) || p.sku.toLowerCase().includes(query) || p.category.toLowerCase().includes(query))
       .slice(0, 25);
-  }, [products, searchQuery]);
+  }, [currentSalonProducts, searchQuery]);
 
 
   // Today's count recorded in this salon
@@ -437,7 +433,7 @@ export default function InputForm() {
               {inputMode === 'single' ? 'Pilih Produk Habis Pakai' : 'Tambah Produk ke Keranjang Batch'}
             </span>
             <span className="text-[10px] text-slate-400 font-normal">
-              {products.length} Produk Siap Dicari
+              {currentSalonProducts.length} Produk {activeSalon.name}
             </span>
           </label>
 

@@ -2,13 +2,13 @@
 
 import React, { useState } from 'react';
 import { useApp } from '@/context/AppContext';
-import { Scissors, Lock, User, Building2, AlertCircle, ArrowRight, ShieldCheck, Info } from 'lucide-react';
+import { Scissors, Lock, User, Building2, AlertCircle, ArrowRight, ShieldCheck } from 'lucide-react';
 
 export default function LoginView() {
   const { salons, login } = useApp();
-  const [username, setUsername] = useState('budi');
-  const [pin, setPin] = useState('1234');
-  const [selectedSalonId, setSelectedSalonId] = useState('seminyak');
+  const [username, setUsername] = useState('');
+  const [pin, setPin] = useState('');
+  const [selectedSalonId, setSelectedSalonId] = useState(salons[0]?.id || 'seminyak');
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -19,13 +19,6 @@ export default function LoginView() {
     if (!result.success) {
       setErrorMsg(result.message || 'Login gagal');
     }
-  };
-
-  const handleQuickDemo = (user: string, demoPin: string, salon: string) => {
-    setUsername(user);
-    setPin(demoPin);
-    setSelectedSalonId(salon);
-    setErrorMsg(null);
   };
 
   return (
@@ -100,7 +93,7 @@ export default function LoginView() {
               </label>
               <input
                 type="text"
-                placeholder="Contoh: budi atau dewi"
+                placeholder="Masukkan username atau nama"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 className="w-full text-xs font-medium px-3.5 py-3 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 transition-all text-slate-800"
@@ -133,46 +126,6 @@ export default function LoginView() {
               <ArrowRight className="w-4 h-4" />
             </button>
           </form>
-
-          {/* Development Quick Demo Helper (Hanya untuk kemudahan tes di tahap pengembangan) */}
-          <div className="mt-6 pt-5 border-t border-slate-100">
-            <div className="flex items-center gap-1 text-[11px] font-bold text-amber-700 mb-1.5">
-              <Info className="w-3.5 h-3.5" />
-              <span>Bantuan Akun Uji Coba Lokal:</span>
-            </div>
-            <p className="text-[10px] text-slate-400 mb-2 leading-tight">
-              (Bantuan ini hanya aktif saat uji coba di laptop Anda, otomatis tidak tampil ketika website sudah online di Vercel)
-            </p>
-
-            <div className="grid grid-cols-2 gap-2 text-left">
-              <button
-                type="button"
-                onClick={() => handleQuickDemo('budi', '1234', 'seminyak')}
-                className="p-2 rounded-xl bg-slate-50 hover:bg-emerald-50 border border-slate-200/80 hover:border-emerald-300 transition-all text-xs"
-              >
-                <p className="font-bold text-slate-800">Staff Seminyak</p>
-                <p className="text-[10px] text-slate-500">User: budi | PIN: 1234</p>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => handleQuickDemo('michael', '1234', 'canggu')}
-                className="p-2 rounded-xl bg-slate-50 hover:bg-emerald-50 border border-slate-200/80 hover:border-emerald-300 transition-all text-xs"
-              >
-                <p className="font-bold text-slate-800">Staff Canggu</p>
-                <p className="text-[10px] text-slate-500">User: michael | PIN: 1234</p>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => handleQuickDemo('admin', 'admin123', 'seminyak')}
-                className="p-2 rounded-xl bg-slate-50 hover:bg-emerald-50 border border-slate-200/80 hover:border-emerald-300 transition-all text-xs col-span-2"
-              >
-                <p className="font-bold text-emerald-800">Super Admin (Bisa Akses Semua Salon)</p>
-                <p className="text-[10px] text-slate-500">User: admin | PIN: admin123</p>
-              </button>
-            </div>
-          </div>
         </div>
 
         <p className="text-center text-[11px] text-slate-400 mt-6">

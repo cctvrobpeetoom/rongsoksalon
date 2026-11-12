@@ -4,6 +4,25 @@ Dokumen ini mencatat setiap keputusan arsitektur, fase pengerjaan, skema data, d
 
 ---
 
+## [Revisi] - Penghapusan Bantuan Login Uji Coba, Dropdown Jabatan, Placeholder Bersih & Isolasi Database Produk Per Salon
+*Tanggal: 12 November 2026*
+
+### 1. Penghapusan Bantuan Akun Uji Coba di Halaman Login (`src/components/LoginView.tsx`)
+- Kotak bantuan akun uji coba lokal (*Bantuan Akun Uji Coba Lokal* beserta tombol isi cepat) dihapus sepenuhnya agar tidak tampil di versi produksi online (Vercel).
+
+### 2. Dropdown Pilihan Jabatan Staf (`src/components/SettingsView.tsx`)
+- Kolom **Jabatan / Role** pada form *Tambah Staf & Akun Login* maupun modal *Edit Staf* diubah dari input teks bebas menjadi **pilihan dropdown** (`Stylist`, `Senior Stylist`, `Colorist`, `Barber`, `Hairspa Therapist`, `Manager / Supervisor`, `Kasir / Admin`, `Assistant`).
+
+### 3. Kolom Input Menggunakan Placeholder (Kosong Saat Siap Diketik)
+- Nilai awal bawaan yang terisi otomatis (seperti username `budi` dan PIN `1234` di halaman Login, serta PIN `1234` dan kategori `Hair Care` di Pengaturan) dihapus dari state awal dan dipindahkan ke atribut `placeholder`, sehingga kolom langsung bersih saat diklik/diketik tanpa perlu menghapus teks contoh terlebih dahulu.
+
+### 4. Isolasi Ketat Database Produk Per Cabang Salon
+- Setiap produk kini terikat dengan `salonId` (`src/types/index.ts`, `src/data/initialData.ts`, `src/context/AppContext.tsx`).
+- Penambahan produk manual, impor CSV Zenoti, ekspor CSV, tampilan katalog di Pengaturan (`SettingsView.tsx`), dan pencarian produk pada form input (`InputForm.tsx`) hanya membaca dan menulis data milik salon yang sedang aktif (`currentSalonProducts`), dengan kunci penyimpanan `localStorage` versi `rongsok_products_v2`.
+- Skema Supabase (`supabase_schema.sql`) diperbarui dengan kolom `salon_id` pada tabel `public.products` beserta constraint `UNIQUE (salon_id, sku)` dan indeks `idx_products_salon`.
+
+---
+
 ## [Fase 5] - Persiapan PWA Mobile, Skema Database Supabase & Panduan Deploy Vercel (Selesai)
 *Tanggal: 10 November 2026*
 

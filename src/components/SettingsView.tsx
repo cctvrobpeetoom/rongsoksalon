@@ -46,13 +46,24 @@ export default function SettingsView() {
     addStaff,
     updateStaff,
     deleteStaff,
-    products,
+    currentSalonProducts,
     addProduct,
     updateProduct,
     deleteProduct,
     importProducts,
     currentUser,
   } = useApp();
+
+  const STAFF_ROLES = [
+    'Stylist',
+    'Senior Stylist',
+    'Colorist',
+    'Barber',
+    'Hairspa Therapist',
+    'Manager / Supervisor',
+    'Kasir / Admin',
+    'Assistant',
+  ];
 
   const isSuperAdmin = currentUser?.role === 'superadmin';
 
@@ -75,13 +86,13 @@ export default function SettingsView() {
   const [newStaffName, setNewStaffName] = useState('');
   const [newStaffRole, setNewStaffRole] = useState('Stylist');
   const [newStaffUsername, setNewStaffUsername] = useState('');
-  const [newStaffPin, setNewStaffPin] = useState('1234');
+  const [newStaffPin, setNewStaffPin] = useState('');
   const [editingStaff, setEditingStaff] = useState<Staff | null>(null);
 
   // --- PRODUCT MANAGEMENT STATES ---
   const [newProdName, setNewProdName] = useState('');
   const [newProdSku, setNewProdSku] = useState('');
-  const [newProdCategory, setNewProdCategory] = useState('Hair Care');
+  const [newProdCategory, setNewProdCategory] = useState('');
   const [newProdUnit, setNewProdUnit] = useState('Botol');
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [productSearch, setProductSearch] = useState('');
@@ -117,11 +128,11 @@ export default function SettingsView() {
   const handleAddStaff = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newStaffName.trim()) return;
-    addStaff(newStaffName.trim(), newStaffRole.trim(), newStaffUsername.trim(), newStaffPin.trim());
+    addStaff(newStaffName.trim(), newStaffRole.trim(), newStaffUsername.trim(), newStaffPin.trim() || '1234');
     showToast(`Staf "${newStaffName.trim()}" berhasil didaftarkan untuk ${activeSalon.name}`);
     setNewStaffName('');
     setNewStaffUsername('');
-    setNewStaffPin('1234');
+    setNewStaffPin('');
   };
 
   const handleSaveEditStaff = (e: React.FormEvent) => {
@@ -144,12 +155,13 @@ export default function SettingsView() {
     addProduct({
       name: newProdName.trim(),
       sku: newProdSku.trim().toUpperCase(),
-      category: newProdCategory.trim(),
+      category: newProdCategory.trim() || 'General',
       unit: newProdUnit.trim(),
     });
-    showToast(`Produk "${newProdName.trim()}" [${newProdSku.toUpperCase()}] berhasil ditambahkan`);
+    showToast(`Produk "${newProdName.trim()}" [${newProdSku.toUpperCase()}] berhasil ditambahkan ke ${activeSalon.name}`);
     setNewProdName('');
     setNewProdSku('');
+    setNewProdCategory('');
   };
 
   const handleSaveEditProduct = (e: React.FormEvent) => {
@@ -196,7 +208,7 @@ export default function SettingsView() {
         if (catIdx === -1) catIdx = 2;
         if (unitIdx === -1) unitIdx = 3;
 
-        const importedList: Omit<Product, 'id'>[] = [];
+        const importedList: Omit<Product, 'id' | 'salonId'>[] = [];
         for (let i = 1; i < lines.length; i++) {
           // Simple CSV splitter handling quotes
           const row = lines[i].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map((v) => v.replace(/^"|"$/g, '').trim());
@@ -251,7 +263,7 @@ export default function SettingsView() {
   const handleExportCatalog = () => {
     let content = '\uFEFF';
     content += 'Kode SKU Zenoti,Nama Produk,Kategori,Satuan\n';
-    products.forEach((p) => {
+    currentSalonProducts.forEach((p) => {
       content += `"${p.sku}","${p.name.replace(/"/g, '""')}","${p.category}","${p.unit}"\n`;
     });
 
@@ -259,7 +271,7 @@ export default function SettingsView() {
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `Katalog_Master_Produk_RongsokSalon_${products.length}_Items.csv`;
+    link.download = `Katalog_Produk_${activeSalon.name.replace(/\s+/g, '_')}_${currentSalonProducts.length}_Items.csv`;
     link.click();
     URL.revokeObjectURL(url);
   };
@@ -267,12 +279,12 @@ export default function SettingsView() {
   // Filtered & Paginated Products in Catalog
   const categoriesList = useMemo(() => {
     const set = new Set<string>();
-    products.forEach((p) => set.add(p.category));
+    currentSalonProducts.forEach((p) => set.add(p.category));
     return ['Semua', ...Array.from(set)];
-  }, [products]);
+  }, [currentSalonProducts]);
 
   const filteredCatalog = useMemo(() => {
-    return products.filter((p) => {
+    return currentSalonProducts.filter((p) => {
       if (productCategoryFilter !== 'Semua' && p.category !== productCategoryFilter) {
         return false;
       }
@@ -286,7 +298,7 @@ export default function SettingsView() {
       }
       return true;
     });
-  }, [products, productCategoryFilter, productSearch]);
+  }, [currentSalonProducts, productCategoryFilter, productSearch]);
 
   const totalCatalogPages = Math.max(1, Math.ceil(filteredCatalog.length / PRODUCTS_PER_PAGE));
   const currentCatalogItems = filteredCatalog.slice(
@@ -382,7 +394,7 @@ export default function SettingsView() {
                 : 'text-slate-600 hover:text-slate-900'
             }`}
           >
-            Produk ({products.length})
+            Produk ({currentSalonProducts.length})
           </button>
           {isSuperAdmin && (
             <button
@@ -590,33 +602,37 @@ export default function SettingsView() {
               </div>
               <div>
                 <label className="block text-[10px] font-bold text-slate-500 mb-0.5">Jabatan / Role</label>
-                <input
-                  type="text"
-                  placeholder="Contoh: Stylist, Barber, Therapist"
+                <select
                   value={newStaffRole}
                   onChange={(e) => setNewStaffRole(e.target.value)}
-                  className="w-full text-xs px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 font-medium"
+                  className="w-full text-xs px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white font-medium"
                   required
-                />
+                >
+                  {STAFF_ROLES.map((role) => (
+                    <option key={role} value={role}>
+                      {role}
+                    </option>
+                  ))}
+                </select>
               </div>
               <div>
                 <label className="block text-[10px] font-bold text-slate-500 mb-0.5">Username Login</label>
                 <input
                   type="text"
-                  placeholder="Username staf"
+                  placeholder="Contoh: siti"
                   value={newStaffUsername}
                   onChange={(e) => setNewStaffUsername(e.target.value)}
-                  className="w-full text-xs px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 font-medium"
+                  className="w-full text-xs px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white font-medium"
                 />
               </div>
               <div>
-                <label className="block text-[10px] font-bold text-slate-500 mb-0.5">PIN Login (Default 1234)</label>
+                <label className="block text-[10px] font-bold text-slate-500 mb-0.5">PIN Login (Kosongkan = Default 1234)</label>
                 <input
                   type="text"
-                  placeholder="PIN angka 4 digit"
+                  placeholder="Contoh: 1234"
                   value={newStaffPin}
                   onChange={(e) => setNewStaffPin(e.target.value)}
-                  className="w-full text-xs px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 font-medium"
+                  className="w-full text-xs px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white font-medium"
                 />
               </div>
             </div>
@@ -694,30 +710,40 @@ export default function SettingsView() {
                   </div>
                   <div>
                     <label className="text-[10px] font-bold text-slate-500">Jabatan</label>
-                    <input
-                      type="text"
+                    <select
                       value={editingStaff.role}
                       onChange={(e) => setEditingStaff({ ...editingStaff, role: e.target.value })}
-                      className="w-full text-xs px-3 py-1.5 rounded-xl border border-slate-200 bg-slate-50"
+                      className="w-full text-xs px-3 py-1.5 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white font-medium"
                       required
-                    />
+                    >
+                      {!STAFF_ROLES.includes(editingStaff.role) && (
+                        <option value={editingStaff.role}>{editingStaff.role}</option>
+                      )}
+                      {STAFF_ROLES.map((role) => (
+                        <option key={role} value={role}>
+                          {role}
+                        </option>
+                      ))}
+                    </select>
                   </div>
                   <div>
                     <label className="text-[10px] font-bold text-slate-500">Username</label>
                     <input
                       type="text"
+                      placeholder="Username login staf"
                       value={editingStaff.username || ''}
                       onChange={(e) => setEditingStaff({ ...editingStaff, username: e.target.value })}
-                      className="w-full text-xs px-3 py-1.5 rounded-xl border border-slate-200 bg-slate-50 font-mono"
+                      className="w-full text-xs px-3 py-1.5 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white font-mono"
                     />
                   </div>
                   <div>
                     <label className="text-[10px] font-bold text-slate-500">PIN Login</label>
                     <input
                       type="text"
+                      placeholder="Contoh: 1234"
                       value={editingStaff.pin || ''}
                       onChange={(e) => setEditingStaff({ ...editingStaff, pin: e.target.value })}
-                      className="w-full text-xs px-3 py-1.5 rounded-xl border border-slate-200 bg-slate-50 font-mono"
+                      className="w-full text-xs px-3 py-1.5 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white font-mono"
                     />
                   </div>
                   <div className="flex gap-2 pt-2">
@@ -753,14 +779,14 @@ export default function SettingsView() {
               <div>
                 <h3 className="text-xs font-bold flex items-center gap-1.5">
                   <FileSpreadsheet className="w-4 h-4 text-emerald-200" />
-                  Sinkronisasi & Impor Produk dari Zenoti
+                  Sinkronisasi & Impor Produk — {activeSalon.name}
                 </h3>
                 <p className="text-[11px] text-emerald-100">
-                  Impor massal hingga 1.000+ produk sekaligus dari file Excel/CSV Zenoti
+                  Database produk terisolasi khusus untuk {activeSalon.name} (tidak tercampur dengan salon lain)
                 </p>
               </div>
               <span className="text-[10px] font-bold bg-white/20 px-2 py-0.5 rounded-full">
-                {products.length} Produk
+                {currentSalonProducts.length} Produk
               </span>
             </div>
 
@@ -862,7 +888,7 @@ export default function SettingsView() {
           <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-2xs space-y-3">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
               <h3 className="text-xs font-bold text-slate-800">
-                Daftar Katalog Master ({filteredCatalog.length} dari {products.length} produk)
+                Katalog {activeSalon.name} ({filteredCatalog.length} dari {currentSalonProducts.length} produk)
               </h3>
               {/* Category Pills */}
               <div className="flex items-center gap-1 overflow-x-auto py-1 max-w-full">

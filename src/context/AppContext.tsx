@@ -35,10 +35,11 @@ interface AppContextType {
   deleteStaff: (id: string) => void;
 
   products: Product[];
-  addProduct: (product: Omit<Product, 'id'>) => void;
-  updateProduct: (id: string, data: Partial<Omit<Product, 'id'>>) => void;
+  currentSalonProducts: Product[];
+  addProduct: (product: Omit<Product, 'id' | 'salonId'>) => void;
+  updateProduct: (id: string, data: Partial<Omit<Product, 'id' | 'salonId'>>) => void;
   deleteProduct: (id: string) => void;
-  importProducts: (products: Omit<Product, 'id'>[]) => { addedCount: number; updatedCount: number };
+  importProducts: (products: Omit<Product, 'id' | 'salonId'>[]) => { addedCount: number; updatedCount: number };
 
   transactions: RongsokTransaction[];
   currentSalonTransactions: RongsokTransaction[];
@@ -82,7 +83,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       const savedStaff = localStorage.getItem('rongsok_staff');
       if (savedStaff) setStaffList(JSON.parse(savedStaff));
 
-      const savedProducts = localStorage.getItem('rongsok_products');
+      const savedProducts = localStorage.getItem('rongsok_products_v2');
       if (savedProducts) setProducts(JSON.parse(savedProducts));
 
       const savedTrx = localStorage.getItem('rongsok_transactions');
@@ -107,7 +108,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       localStorage.setItem('rongsok_active_salon', activeSalonId);
       localStorage.setItem('rongsok_areas', JSON.stringify(areas));
       localStorage.setItem('rongsok_staff', JSON.stringify(staffList));
-      localStorage.setItem('rongsok_products', JSON.stringify(products));
+      localStorage.setItem('rongsok_products_v2', JSON.stringify(products));
       localStorage.setItem('rongsok_transactions', JSON.stringify(transactions));
     } catch (e) {
       console.error('Failed to save to storage', e);
@@ -235,9 +236,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  // Filtered lists per current salon
+  // Filtered lists per current salon (Strict database isolation per salon)
   const currentSalonAreas = areas.filter((a) => a.salonId === activeSalonId);
   const currentSalonStaff = staffList.filter((s) => s.salonId === activeSalonId && s.isActive);
+  const currentSalonProducts = products.filter((p) => p.salonId === activeSalonId);
   const currentSalonTransactions = transactions.filter((t) => t.salonId === activeSalonId);
 
   // Area CRUD
@@ -281,29 +283,32 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setStaffList((prev) => prev.filter((s) => s.id !== id));
   };
 
-  // Product CRUD & Bulk Import (De-duplicates by SKU)
-  const addProduct = (productData: Omit<Product, 'id'>) => {
+  // Product CRUD & Bulk Import (Strict salonId isolation & SKU deduplication per salon)
+  const addProduct = (productData: Omit<Product, 'id' | 'salonId'>) => {
     const cleanSku = productData.sku.trim().toUpperCase();
-    const existingIndex = products.findIndex((p) => p.sku.toUpperCase() === cleanSku);
+    const existingIndex = products.findIndex(
+      (p) => p.salonId === activeSalonId && p.sku.toUpperCase() === cleanSku
+    );
 
     if (existingIndex >= 0) {
-      // Update existing
+      // Update existing inside the same salon
       setProducts((prev) =>
         prev.map((p, idx) =>
-          idx === existingIndex ? { ...p, ...productData, sku: cleanSku } : p
+          idx === existingIndex ? { ...p, ...productData, sku: cleanSku, salonId: activeSalonId } : p
         )
       );
     } else {
       const newProduct: Product = {
         ...productData,
+        salonId: activeSalonId,
         sku: cleanSku,
-        id: `prd-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
+        id: `prd-${activeSalonId}-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
       };
       setProducts((prev) => [newProduct, ...prev]);
     }
   };
 
-  const updateProduct = (id: string, data: Partial<Omit<Product, 'id'>>) => {
+  const updateProduct = (id: string, data: Partial<Omit<Product, 'id' | 'salonId'>>) => {
     setProducts((prev) =>
       prev.map((p) => (p.id === id ? { ...p, ...data, sku: data.sku ? data.sku.toUpperCase() : p.sku } : p))
     );
@@ -313,21 +318,22 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setProducts((prev) => prev.filter((p) => p.id !== id));
   };
 
-  const importProducts = (newProducts: Omit<Product, 'id'>[]) => {
+  const importProducts = (newProducts: Omit<Product, 'id' | 'salonId'>[]) => {
     let addedCount = 0;
     let updatedCount = 0;
 
     setProducts((prev) => {
       const map = new Map<string, Product>();
-      prev.forEach((p) => map.set(p.sku.toUpperCase(), p));
+      prev.forEach((p) => map.set(`${p.salonId}::${p.sku.toUpperCase()}`, p));
 
       newProducts.forEach((np, idx) => {
         const cleanSku = np.sku.trim().toUpperCase();
         if (!cleanSku || !np.name) return;
 
-        if (map.has(cleanSku)) {
-          const existing = map.get(cleanSku)!;
-          map.set(cleanSku, {
+        const key = `${activeSalonId}::${cleanSku}`;
+        if (map.has(key)) {
+          const existing = map.get(key)!;
+          map.set(key, {
             ...existing,
             name: np.name.trim(),
             category: np.category.trim() || existing.category,
@@ -335,8 +341,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
           });
           updatedCount++;
         } else {
-          map.set(cleanSku, {
-            id: `prd-imp-${Date.now()}-${idx}`,
+          map.set(key, {
+            id: `prd-${activeSalonId}-imp-${Date.now()}-${idx}`,
+            salonId: activeSalonId,
             sku: cleanSku,
             name: np.name.trim(),
             category: np.category.trim() || 'General',
@@ -389,6 +396,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         updateStaff,
         deleteStaff,
         products,
+        currentSalonProducts,
         addProduct,
         updateProduct,
         deleteProduct,

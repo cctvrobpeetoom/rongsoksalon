@@ -25,6 +25,7 @@ export interface Staff {
 
 export interface Product {
   id: string;
+  salonId: string; // Produk terisolasi per cabang salon
   sku: string; // Kode unik Zenoti
   name: string;
   category: string;
