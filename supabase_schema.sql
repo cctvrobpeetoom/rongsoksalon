@@ -91,25 +91,16 @@ INSERT INTO public.salons (id, name, address, is_active) VALUES
 ('uluwatu', 'Salon Uluwatu', 'Jl. Labuansait No. 5, Pecatu', true)
 ON CONFLICT (id) DO NOTHING;
 
--- Area Seminyak
+-- Area Seminyak (Sumber saja)
 INSERT INTO public.areas (id, salon_id, name, type) VALUES
 ('sem-amb-1', 'seminyak', 'Gudang Atas', 'ambil'),
-('sem-amb-2', 'seminyak', 'Gudang Bawah', 'ambil'),
-('sem-tar-1', 'seminyak', 'Salon Floor', 'taruh'),
-('sem-tar-2', 'seminyak', 'Barber Area', 'taruh'),
-('sem-tar-3', 'seminyak', 'Hairspa 1', 'taruh'),
-('sem-tar-4', 'seminyak', 'Hairspa 2', 'taruh'),
-('sem-tar-5', 'seminyak', 'Color Bar', 'taruh')
+('sem-amb-2', 'seminyak', 'Gudang Bawah', 'ambil')
 ON CONFLICT (id) DO NOTHING;
 
--- Area Canggu
+-- Area Canggu (Sumber saja)
 INSERT INTO public.areas (id, salon_id, name, type) VALUES
 ('cng-amb-1', 'canggu', 'Gudang Utama Lantai 2', 'ambil'),
-('cng-amb-2', 'canggu', 'Lemari Kasir', 'ambil'),
-('cng-tar-1', 'canggu', 'Station Styling 1-4', 'taruh'),
-('cng-tar-2', 'canggu', 'Wash Basin Room', 'taruh'),
-('cng-tar-3', 'canggu', 'Barbershop VIP', 'taruh'),
-('cng-tar-4', 'canggu', 'Treatment Spa', 'taruh')
+('cng-amb-2', 'canggu', 'Lemari Kasir', 'ambil')
 ON CONFLICT (id) DO NOTHING;
 
 -- Data awal staf dikosongkan agar admin menginput ulang seluruh staf langsung dari aplikasi.

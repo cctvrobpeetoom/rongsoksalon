@@ -48,14 +48,12 @@ export default function InputForm() {
 
   // Filter take & place areas
   const ambilAreas = useMemo(() => currentSalonAreas.filter((a) => a.type === 'ambil'), [currentSalonAreas]);
-  const taruhAreas = useMemo(() => currentSalonAreas.filter((a) => a.type === 'taruh'), [currentSalonAreas]);
 
   // Form base states
   const todayStr = new Date().toISOString().split('T')[0];
   const [date, setDate] = useState(todayStr);
   const [staffId, setStaffId] = useState('');
   const [sourceAreaId, setSourceAreaId] = useState('');
-  const [targetAreaId, setTargetAreaId] = useState('');
 
   // Single mode states
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
@@ -91,8 +89,7 @@ export default function InputForm() {
     }
 
     setSourceAreaId(ambilAreas[0]?.id || '');
-    setTargetAreaId(taruhAreas[0]?.id || '');
-  }, [activeSalon.id, currentSalonStaff, ambilAreas, taruhAreas, currentUser]);
+  }, [activeSalon.id, currentSalonStaff, ambilAreas, currentUser]);
 
   // Close search dropdown on click outside
   useEffect(() => {
@@ -164,19 +161,13 @@ export default function InputForm() {
       setErrorMessage('Silakan pilih nama petugas!');
       return;
     }
-    if (!sourceAreaId || !targetAreaId) {
-      setErrorMessage('Silakan tentukan Area Ambil dan Area Taruh produk!');
-      return;
-    }
-    // Business Rule: Area Ambil & Taruh should be logically distinct
-    if (sourceAreaId === targetAreaId) {
-      setErrorMessage('Perhatian: Area Ambil (sumber) dan Area Taruh (tujuan) tidak boleh area yang sama!');
+    if (!sourceAreaId) {
+      setErrorMessage('Silakan tentukan Area Sumber produk!');
       return;
     }
 
     const currentStaff = currentSalonStaff.find((s) => s.id === staffId);
     const sourceArea = ambilAreas.find((a) => a.id === sourceAreaId);
-    const targetArea = taruhAreas.find((a) => a.id === targetAreaId);
 
     addTransaction({
       date,
@@ -189,8 +180,8 @@ export default function InputForm() {
       productUnit: selectedProduct.unit,
       sourceAreaId,
       sourceAreaName: sourceArea ? sourceArea.name : 'Gudang',
-      targetAreaId,
-      targetAreaName: targetArea ? targetArea.name : 'Salon',
+      targetAreaId: '',
+      targetAreaName: '-',
       qty,
       notes: notes.trim() || undefined,
     });
@@ -217,18 +208,13 @@ export default function InputForm() {
       setErrorMessage('Silakan pilih nama petugas!');
       return;
     }
-    if (!sourceAreaId || !targetAreaId) {
-      setErrorMessage('Silakan tentukan Area Ambil dan Area Taruh!');
-      return;
-    }
-    if (sourceAreaId === targetAreaId) {
-      setErrorMessage('Perhatian: Area Ambil dan Area Taruh tidak boleh sama!');
+    if (!sourceAreaId) {
+      setErrorMessage('Silakan tentukan Area Sumber!');
       return;
     }
 
     const currentStaff = currentSalonStaff.find((s) => s.id === staffId);
     const sourceArea = ambilAreas.find((a) => a.id === sourceAreaId);
-    const targetArea = taruhAreas.find((a) => a.id === targetAreaId);
 
     const totalBatchPcs = batchItems.reduce((acc, curr) => acc + curr.qty, 0);
 
@@ -245,8 +231,8 @@ export default function InputForm() {
         productUnit: item.product.unit,
         sourceAreaId,
         sourceAreaName: sourceArea ? sourceArea.name : 'Gudang',
-        targetAreaId,
-        targetAreaName: targetArea ? targetArea.name : 'Salon',
+        targetAreaId: '',
+        targetAreaName: '-',
         qty: item.qty,
         notes: item.notes?.trim() || undefined,
       });
@@ -379,49 +365,25 @@ export default function InputForm() {
           </div>
         </div>
 
-        {/* Row 2: Area Ambil & Area Taruh (2 Kolom) */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-0.5">
-          {/* Area Ambil */}
-          <div>
-            <label className="block text-xs font-bold text-slate-700 mb-1 flex items-center gap-1.5">
-              <Layers className="w-3.5 h-3.5 text-amber-500" />
-              Sumber: Area Ambil Barang
-            </label>
-            <select
-              value={sourceAreaId}
-              onChange={(e) => setSourceAreaId(e.target.value)}
-              className="w-full text-xs font-medium px-3 py-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 transition-all text-slate-800"
-              required
-            >
-              <option value="" disabled>-- Pilih Area Ambil --</option>
-              {ambilAreas.map((area) => (
-                <option key={area.id} value={area.id}>
-                  {area.name}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Area Taruh */}
-          <div>
-            <label className="block text-xs font-bold text-slate-700 mb-1 flex items-center gap-1.5">
-              <Layers className="w-3.5 h-3.5 text-emerald-500" />
-              Tujuan: Area Taruh Produk
-            </label>
-            <select
-              value={targetAreaId}
-              onChange={(e) => setTargetAreaId(e.target.value)}
-              className="w-full text-xs font-medium px-3 py-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 transition-all text-slate-800"
-              required
-            >
-              <option value="" disabled>-- Pilih Area Taruh --</option>
-              {taruhAreas.map((area) => (
-                <option key={area.id} value={area.id}>
-                  {area.name}
-                </option>
-              ))}
-            </select>
-          </div>
+        {/* Row 2: Area Sumber (Hanya Sumber) */}
+        <div className="pt-0.5">
+          <label className="block text-xs font-bold text-slate-700 mb-1 flex items-center gap-1.5">
+            <Layers className="w-3.5 h-3.5 text-amber-500" />
+            Sumber: Area Ambil Barang
+          </label>
+          <select
+            value={sourceAreaId}
+            onChange={(e) => setSourceAreaId(e.target.value)}
+            className="w-full text-xs font-medium px-3 py-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 transition-all text-slate-800"
+            required
+          >
+            <option value="" disabled>-- Pilih Area Sumber --</option>
+            {ambilAreas.map((area) => (
+              <option key={area.id} value={area.id}>
+                {area.name}
+              </option>
+            ))}
+          </select>
         </div>
 
 
@@ -702,7 +664,7 @@ export default function InputForm() {
                 <div className="min-w-0 flex-1">
                   <p className="font-bold text-slate-800 truncate">{trx.productName}</p>
                   <p className="text-[10px] text-slate-400">
-                    {trx.sourceAreaName} $\rightarrow$ {trx.targetAreaName} • Oleh: {trx.staffName}
+                    Sumber: {trx.sourceAreaName} • Oleh: {trx.staffName}
                   </p>
                 </div>
                 <span className="font-extrabold text-emerald-600 text-xs shrink-0">

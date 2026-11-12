@@ -9,7 +9,6 @@ import {
   Package,
   Layers,
   User,
-  ArrowRight,
   Calendar,
   AlertCircle,
   ChevronLeft,
@@ -214,9 +213,7 @@ export default function HistoryList() {
               {/* Area Movement & Staff */}
               <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-xs text-slate-600 flex-wrap gap-2">
                 <div className="flex items-center gap-1.5 text-[11px] font-medium bg-slate-50 px-2.5 py-1 rounded-lg border border-slate-100">
-                  <span className="text-amber-700 font-semibold">{trx.sourceAreaName}</span>
-                  <ArrowRight className="w-3 h-3 text-slate-400" />
-                  <span className="text-emerald-700 font-semibold">{trx.targetAreaName}</span>
+                  <span className="text-amber-700 font-semibold">Sumber: {trx.sourceAreaName}</span>
                 </div>
 
                 <div className="flex items-center gap-3">

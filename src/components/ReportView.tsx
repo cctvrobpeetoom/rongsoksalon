@@ -12,7 +12,6 @@ import {
   Search,
   FileSpreadsheet,
   Building2,
-  ArrowRight,
   User,
   ChevronLeft,
   ChevronRight
@@ -31,7 +30,6 @@ export default function ReportView() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedStaffId, setSelectedStaffId] = useState('');
   const [selectedSourceAreaId, setSelectedSourceAreaId] = useState('');
-  const [selectedTargetAreaId, setSelectedTargetAreaId] = useState('');
   const [isExporting, setIsExporting] = useState(false);
 
   // Pagination for transaction table (20 items per page)
@@ -44,20 +42,18 @@ export default function ReportView() {
       if (trx.date < startDate || trx.date > endDate) return false;
       if (selectedStaffId && trx.staffId !== selectedStaffId) return false;
       if (selectedSourceAreaId && trx.sourceAreaId !== selectedSourceAreaId) return false;
-      if (selectedTargetAreaId && trx.targetAreaId !== selectedTargetAreaId) return false;
       if (searchQuery.trim()) {
         const query = searchQuery.toLowerCase();
         const match =
           trx.productName.toLowerCase().includes(query) ||
           trx.productSku.toLowerCase().includes(query) ||
           trx.staffName.toLowerCase().includes(query) ||
-          trx.targetAreaName.toLowerCase().includes(query) ||
           trx.sourceAreaName.toLowerCase().includes(query);
         if (!match) return false;
       }
       return true;
     });
-  }, [currentSalonTransactions, startDate, endDate, selectedStaffId, selectedSourceAreaId, selectedTargetAreaId, searchQuery]);
+  }, [currentSalonTransactions, startDate, endDate, selectedStaffId, selectedSourceAreaId, searchQuery]);
 
   // Statistics & KPI
   const totalQty = useMemo(() => {
@@ -90,11 +86,11 @@ export default function ReportView() {
     return sorted.slice(0, 5);
   }, [filteredData]);
 
-  // Breakdown per Target Area
+  // Breakdown per Source Area
   const areaBreakdown = useMemo(() => {
     const map = new Map<string, number>();
     filteredData.forEach((trx) => {
-      map.set(trx.targetAreaName, (map.get(trx.targetAreaName) || 0) + trx.qty);
+      map.set(trx.sourceAreaName, (map.get(trx.sourceAreaName) || 0) + trx.qty);
     });
     return Array.from(map.entries()).sort((a, b) => b[1] - a[1]);
   }, [filteredData]);
@@ -127,12 +123,12 @@ export default function ReportView() {
       csvContent += `Tanggal Cetak:,"${new Date().toLocaleString('id-ID')}"\n`;
       csvContent += `Total Barang Habis:,"${totalQty} Pcs"\n\n`;
 
-      csvContent += `No,Tanggal Zenoti/Catat,Petugas,Kode SKU Zenoti,Nama Produk,Satuan,Qty,Area Ambil (Sumber),Area Taruh (Tujuan),Catatan\n`;
+      csvContent += `No,Tanggal Zenoti/Catat,Petugas,Kode SKU Zenoti,Nama Produk,Satuan,Qty,Area Sumber,Catatan\n`;
 
       filteredData.forEach((row, index) => {
         const cleanNotes = (row.notes || '-').replace(/"/g, '""');
         const cleanProduct = row.productName.replace(/"/g, '""');
-        csvContent += `${index + 1},"${row.date}","${row.staffName}","${row.productSku}","${cleanProduct}","${row.productUnit}",${row.qty},"${row.sourceAreaName}","${row.targetAreaName}","${cleanNotes}"\n`;
+        csvContent += `${index + 1},"${row.date}","${row.staffName}","${row.productSku}","${cleanProduct}","${row.productUnit}",${row.qty},"${row.sourceAreaName}","${cleanNotes}"\n`;
       });
 
       const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
@@ -256,17 +252,17 @@ export default function ReportView() {
             ))}
           </select>
 
-          {/* Target area filter */}
+          {/* Source area filter */}
           <select
-            value={selectedTargetAreaId}
+            value={selectedSourceAreaId}
             onChange={(e) => {
-              setSelectedTargetAreaId(e.target.value);
+              setSelectedSourceAreaId(e.target.value);
               setTablePage(1);
             }}
             className="w-full text-xs font-medium px-3 py-2 rounded-xl border border-slate-200 bg-slate-50"
           >
-            <option value="">Semua Area Taruh</option>
-            {currentSalonAreas.filter((a) => a.type === 'taruh').map((area) => (
+            <option value="">Semua Area Sumber</option>
+            {currentSalonAreas.filter((a) => a.type === 'ambil').map((area) => (
               <option key={area.id} value={area.id}>
                 Area: {area.name}
               </option>
@@ -370,11 +366,11 @@ export default function ReportView() {
 
       {/* Area & Staff Breakdown (2 Columns) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        {/* Area Taruh Breakdown */}
+        {/* Area Sumber Breakdown */}
         <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-2xs">
           <h3 className="text-xs font-bold text-slate-800 mb-2 flex items-center gap-1.5">
             <Layers className="w-3.5 h-3.5 text-amber-500" />
-            Penggunaan per Area Taruh
+            Penggunaan per Area Sumber
           </h3>
           <div className="space-y-1.5">
             {areaBreakdown.length === 0 ? (
@@ -447,9 +443,7 @@ export default function ReportView() {
                       {trx.productName}
                     </p>
                     <div className="flex items-center gap-1.5 text-[11px] text-slate-500 mt-0.5">
-                      <span className="text-amber-700 font-medium">{trx.sourceAreaName}</span>
-                      <ArrowRight className="w-3 h-3 text-slate-300" />
-                      <span className="text-emerald-700 font-medium">{trx.targetAreaName}</span>
+                      <span className="text-amber-700 font-medium">Sumber: {trx.sourceAreaName}</span>
                       <span className="text-slate-300">•</span>
                       <span>Oleh: {trx.staffName}</span>
                     </div>

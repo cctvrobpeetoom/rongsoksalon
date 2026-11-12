@@ -77,8 +77,14 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       const savedSalonId = localStorage.getItem('rongsok_active_salon');
       if (savedSalonId) setActiveSalonIdState(savedSalonId);
 
-      const savedAreas = localStorage.getItem('rongsok_areas');
-      if (savedAreas) setAreas(JSON.parse(savedAreas));
+      const savedAreasV2 = localStorage.getItem('rongsok_areas_v2');
+      const legacyAreas = localStorage.getItem('rongsok_areas');
+      if (savedAreasV2) {
+        setAreas((JSON.parse(savedAreasV2) as Area[]).filter((a) => a.type === 'ambil'));
+      } else if (legacyAreas) {
+        setAreas((JSON.parse(legacyAreas) as Area[]).filter((a) => a.type === 'ambil'));
+        localStorage.removeItem('rongsok_areas');
+      }
 
       localStorage.removeItem('rongsok_staff');
       const savedStaff = localStorage.getItem('rongsok_staff_v2');
@@ -107,7 +113,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       }
       localStorage.setItem('rongsok_salons', JSON.stringify(salons));
       localStorage.setItem('rongsok_active_salon', activeSalonId);
-      localStorage.setItem('rongsok_areas', JSON.stringify(areas));
+      localStorage.setItem('rongsok_areas_v2', JSON.stringify(areas));
       localStorage.setItem('rongsok_staff_v2', JSON.stringify(staffList));
       localStorage.setItem('rongsok_products_v2', JSON.stringify(products));
       localStorage.setItem('rongsok_transactions', JSON.stringify(transactions));
@@ -254,7 +260,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   };
 
   // Filtered lists per current salon (Strict database isolation per salon)
-  const currentSalonAreas = areas.filter((a) => a.salonId === activeSalonId);
+  const currentSalonAreas = areas.filter((a) => a.salonId === activeSalonId && a.type === 'ambil');
   const currentSalonStaff = staffList.filter((s) => s.salonId === activeSalonId && s.isActive);
   const currentSalonProducts = products.filter((p) => p.salonId === activeSalonId);
   const currentSalonTransactions = transactions.filter((t) => t.salonId === activeSalonId);

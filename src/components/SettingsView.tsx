@@ -79,7 +79,6 @@ export default function SettingsView() {
 
   // --- AREA MANAGEMENT STATES ---
   const [newAreaName, setNewAreaName] = useState('');
-  const [newAreaType, setNewAreaType] = useState<'ambil' | 'taruh'>('ambil');
   const [editingArea, setEditingArea] = useState<Area | null>(null);
 
   // --- STAFF MANAGEMENT STATES ---
@@ -111,16 +110,16 @@ export default function SettingsView() {
   const handleAddArea = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newAreaName.trim()) return;
-    addArea(newAreaName.trim(), newAreaType);
-    showToast(`Berhasil menambah area: "${newAreaName.trim()}"`);
+    addArea(newAreaName.trim(), 'ambil');
+    showToast(`Berhasil menambah area sumber: "${newAreaName.trim()}"`);
     setNewAreaName('');
   };
 
   const handleSaveEditArea = (e: React.FormEvent) => {
     e.preventDefault();
     if (!editingArea) return;
-    updateArea(editingArea.id, editingArea.name.trim(), editingArea.type);
-    showToast(`Area berhasil diubah menjadi: "${editingArea.name}"`);
+    updateArea(editingArea.id, editingArea.name.trim(), 'ambil');
+    showToast(`Area sumber berhasil diubah menjadi: "${editingArea.name}"`);
     setEditingArea(null);
   };
 
@@ -330,7 +329,6 @@ export default function SettingsView() {
   };
 
   const ambilAreas = currentSalonAreas.filter((a) => a.type === 'ambil');
-  const taruhAreas = currentSalonAreas.filter((a) => a.type === 'taruh');
 
   return (
     <div className="w-full max-w-2xl mx-auto pb-24 sm:pb-8 space-y-4">
@@ -412,120 +410,70 @@ export default function SettingsView() {
       </div>
 
       {/* ============================================================== */}
-      {/* 1. SUBTAB: AREA AMBIL & TARUH (CRUD)                           */}
+      {/* 1. SUBTAB: AREA SUMBER SALON (CRUD)                            */}
       {/* ============================================================== */}
       {activeSubTab === 'area' && (
         <div className="space-y-4">
-          {/* Add Area Form */}
+          {/* Add Area Form (Hanya Sumber) */}
           <form onSubmit={handleAddArea} className="bg-white p-4 rounded-2xl border border-slate-200 shadow-2xs space-y-3">
             <h2 className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
               <Plus className="w-3.5 h-3.5 text-emerald-600" />
-              Tambah Area Baru di {activeSalon.name}
+              Tambah Area Sumber Baru di {activeSalon.name}
             </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+            <div>
               <input
                 type="text"
-                placeholder="Nama Area (e.g. Gudang Atas, Hairspa 3)"
+                placeholder="Nama Area Sumber (e.g. Gudang Atas, Lemari Kasir)"
                 value={newAreaName}
                 onChange={(e) => setNewAreaName(e.target.value)}
-                className="sm:col-span-2 text-xs px-3 py-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 font-medium"
+                className="w-full text-xs px-3 py-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 font-medium"
                 required
               />
-              <select
-                value={newAreaType}
-                onChange={(e) => setNewAreaType(e.target.value as 'ambil' | 'taruh')}
-                className="text-xs px-3 py-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white font-medium"
-              >
-                <option value="ambil">Tipe: Area Ambil (Sumber)</option>
-                <option value="taruh">Tipe: Area Taruh (Tujuan)</option>
-              </select>
             </div>
             <button
               type="submit"
               className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-bold text-xs rounded-xl shadow-xs transition-all"
             >
-              Simpan Area
+              Simpan Area Sumber
             </button>
           </form>
 
-          {/* Area Lists */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {/* Area Ambil List */}
-            <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-2xs">
-              <h3 className="text-xs font-bold text-amber-800 mb-2.5 flex items-center gap-1">
-                <Layers className="w-3.5 h-3.5 text-amber-500" />
-                Area Ambil (Sumber Barang) ({ambilAreas.length})
-              </h3>
-              <div className="space-y-1.5">
-                {ambilAreas.length === 0 ? (
-                  <p className="text-xs text-slate-400 italic py-2">Belum ada area ambil.</p>
-                ) : (
-                  ambilAreas.map((a) => (
-                    <div key={a.id} className="flex items-center justify-between text-xs p-2 rounded-lg bg-amber-50/50 border border-amber-100/60">
-                      <span className="font-semibold text-slate-800 truncate">{a.name}</span>
-                      <div className="flex items-center gap-1 shrink-0">
-                        <button
-                          type="button"
-                          onClick={() => setEditingArea(a)}
-                          className="text-slate-400 hover:text-amber-700 p-1"
-                          title="Edit Area"
-                        >
-                          <Edit2 className="w-3.5 h-3.5" />
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            if (confirm(`Hapus area "${a.name}"?`)) deleteArea(a.id);
-                          }}
-                          className="text-slate-400 hover:text-red-500 p-1"
-                          title="Hapus Area"
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </button>
-                      </div>
+          {/* Area Sumber List */}
+          <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-2xs">
+            <h3 className="text-xs font-bold text-amber-800 mb-2.5 flex items-center gap-1">
+              <Layers className="w-3.5 h-3.5 text-amber-500" />
+              Area Sumber (Pengambilan Barang) ({ambilAreas.length})
+            </h3>
+            <div className="space-y-1.5">
+              {ambilAreas.length === 0 ? (
+                <p className="text-xs text-slate-400 italic py-2">Belum ada area sumber.</p>
+              ) : (
+                ambilAreas.map((a) => (
+                  <div key={a.id} className="flex items-center justify-between text-xs p-2 rounded-lg bg-amber-50/50 border border-amber-100/60">
+                    <span className="font-semibold text-slate-800 truncate">{a.name}</span>
+                    <div className="flex items-center gap-1 shrink-0">
+                      <button
+                        type="button"
+                        onClick={() => setEditingArea(a)}
+                        className="text-slate-400 hover:text-amber-700 p-1"
+                        title="Edit Area"
+                      >
+                        <Edit2 className="w-3.5 h-3.5" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (confirm(`Hapus area "${a.name}"?`)) deleteArea(a.id);
+                        }}
+                        className="text-slate-400 hover:text-red-500 p-1"
+                        title="Hapus Area"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
                     </div>
-                  ))
-                )}
-              </div>
-            </div>
-
-            {/* Area Taruh List */}
-            <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-2xs">
-              <h3 className="text-xs font-bold text-emerald-800 mb-2.5 flex items-center gap-1">
-                <Layers className="w-3.5 h-3.5 text-emerald-500" />
-                Area Taruh (Tujuan Pakai) ({taruhAreas.length})
-              </h3>
-              <div className="space-y-1.5">
-                {taruhAreas.length === 0 ? (
-                  <p className="text-xs text-slate-400 italic py-2">Belum ada area taruh.</p>
-                ) : (
-                  taruhAreas.map((a) => (
-                    <div key={a.id} className="flex items-center justify-between text-xs p-2 rounded-lg bg-emerald-50/50 border border-emerald-100/60">
-                      <span className="font-semibold text-slate-800 truncate">{a.name}</span>
-                      <div className="flex items-center gap-1 shrink-0">
-                        <button
-                          type="button"
-                          onClick={() => setEditingArea(a)}
-                          className="text-slate-400 hover:text-emerald-700 p-1"
-                          title="Edit Area"
-                        >
-                          <Edit2 className="w-3.5 h-3.5" />
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            if (confirm(`Hapus area "${a.name}"?`)) deleteArea(a.id);
-                          }}
-                          className="text-slate-400 hover:text-red-500 p-1"
-                          title="Hapus Area"
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </button>
-                      </div>
-                    </div>
-                  ))
-                )}
-              </div>
+                  </div>
+                ))
+              )}
             </div>
           </div>
 
@@ -533,23 +481,16 @@ export default function SettingsView() {
           {editingArea && (
             <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
               <div className="bg-white rounded-2xl p-5 max-w-sm w-full shadow-2xl space-y-3">
-                <h3 className="text-xs font-bold text-slate-800">Edit Nama & Tipe Area</h3>
+                <h3 className="text-xs font-bold text-slate-800">Edit Nama Area Sumber</h3>
                 <form onSubmit={handleSaveEditArea} className="space-y-3">
                   <input
                     type="text"
+                    placeholder="Nama area sumber"
                     value={editingArea.name}
                     onChange={(e) => setEditingArea({ ...editingArea, name: e.target.value })}
                     className="w-full text-xs px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white"
                     required
                   />
-                  <select
-                    value={editingArea.type}
-                    onChange={(e) => setEditingArea({ ...editingArea, type: e.target.value as 'ambil' | 'taruh' })}
-                    className="w-full text-xs px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 font-medium"
-                  >
-                    <option value="ambil">Area Ambil (Sumber)</option>
-                    <option value="taruh">Area Taruh (Tujuan)</option>
-                  </select>
                   <div className="flex gap-2">
                     <button
                       type="button"

@@ -16,49 +16,28 @@ export const INITIAL_SALONS: Salon[] = [
 ];
 
 export const INITIAL_AREAS: Area[] = [
-  // Seminyak
+  // Seminyak (Sumber saja)
   { id: 'sem-amb-1', salonId: 'seminyak', name: 'Gudang Atas', type: 'ambil' },
   { id: 'sem-amb-2', salonId: 'seminyak', name: 'Gudang Bawah', type: 'ambil' },
-  { id: 'sem-tar-1', salonId: 'seminyak', name: 'Salon Floor', type: 'taruh' },
-  { id: 'sem-tar-2', salonId: 'seminyak', name: 'Barber Area', type: 'taruh' },
-  { id: 'sem-tar-3', salonId: 'seminyak', name: 'Hairspa 1', type: 'taruh' },
-  { id: 'sem-tar-4', salonId: 'seminyak', name: 'Hairspa 2', type: 'taruh' },
-  { id: 'sem-tar-5', salonId: 'seminyak', name: 'Color Bar', type: 'taruh' },
 
-  // Canggu
+  // Canggu (Sumber saja)
   { id: 'cng-amb-1', salonId: 'canggu', name: 'Gudang Utama Lantai 2', type: 'ambil' },
   { id: 'cng-amb-2', salonId: 'canggu', name: 'Lemari Kasir', type: 'ambil' },
-  { id: 'cng-tar-1', salonId: 'canggu', name: 'Station Styling 1-4', type: 'taruh' },
-  { id: 'cng-tar-2', salonId: 'canggu', name: 'Wash Basin Room', type: 'taruh' },
-  { id: 'cng-tar-3', salonId: 'canggu', name: 'Barbershop VIP', type: 'taruh' },
-  { id: 'cng-tar-4', salonId: 'canggu', name: 'Treatment Spa', type: 'taruh' },
 
-  // Ubud
+  // Ubud (Sumber saja)
   { id: 'ubd-amb-1', salonId: 'ubud', name: 'Gudang Belakang', type: 'ambil' },
-  { id: 'ubd-tar-1', salonId: 'ubud', name: 'Main Hall Salon', type: 'taruh' },
-  { id: 'ubd-tar-2', salonId: 'ubud', name: 'Creambath Room A', type: 'taruh' },
-  { id: 'ubd-tar-3', salonId: 'ubud', name: 'Creambath Room B', type: 'taruh' },
 
-  // Sanur
+  // Sanur (Sumber saja)
   { id: 'snr-amb-1', salonId: 'sanur', name: 'Gudang Sentral', type: 'ambil' },
-  { id: 'snr-tar-1', salonId: 'sanur', name: 'Area Shampo', type: 'taruh' },
-  { id: 'snr-tar-2', salonId: 'sanur', name: 'Area Potong Rambut', type: 'taruh' },
-  { id: 'snr-tar-3', salonId: 'sanur', name: 'Ruang Hair Spa', type: 'taruh' },
 
-  // Kuta
+  // Kuta (Sumber saja)
   { id: 'kta-amb-1', salonId: 'kuta', name: 'Gudang Produk', type: 'ambil' },
-  { id: 'kta-tar-1', salonId: 'kuta', name: 'Salon Station', type: 'taruh' },
-  { id: 'kta-tar-2', salonId: 'kuta', name: 'Barber Corner', type: 'taruh' },
 
-  // Jimbaran
+  // Jimbaran (Sumber saja)
   { id: 'jmb-amb-1', salonId: 'jimbaran', name: 'Gudang Stock', type: 'ambil' },
-  { id: 'jmb-tar-1', salonId: 'jimbaran', name: 'Treatment Room 1', type: 'taruh' },
-  { id: 'jmb-tar-2', salonId: 'jimbaran', name: 'Treatment Room 2', type: 'taruh' },
 
-  // Uluwatu
+  // Uluwatu (Sumber saja)
   { id: 'ulw-amb-1', salonId: 'uluwatu', name: 'Gudang Depan', type: 'ambil' },
-  { id: 'ulw-tar-1', salonId: 'uluwatu', name: 'Salon Floor', type: 'taruh' },
-  { id: 'ulw-tar-2', salonId: 'uluwatu', name: 'Cliffside Spa', type: 'taruh' },
 ];
 
 // Daftar staf awal dikosongkan agar admin menginput ulang seluruh staf secara mandiri

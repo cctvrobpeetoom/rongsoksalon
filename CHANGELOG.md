@@ -29,6 +29,11 @@ Dokumen ini mencatat setiap keputusan arsitektur, fase pengerjaan, skema data, d
 - Kredensial Super Admin diperbarui dengan 2 akses aktif (`username: admin` dengan password `Petitenget16`, serta akun Super Admin tambahan `username: admin` dengan password `sigitlapar`), dan login Super Admin diprioritaskan agar dapat mengakses seluruh cabang.
 - Kunci penyimpanan staf diperbarui ke `rongsok_staff_v2` (dan data lama `rongsok_staff` dibersihkan otomatis) agar seluruh staf mulai kosong dan dapat diinput ulang dari menu Pengaturan > Staf.
 
+### 7. Penghapusan Form Area Tujuan — Hanya Area Sumber (`SettingsView.tsx`, `InputForm.tsx`, `HistoryList.tsx`, `ReportView.tsx`)
+- Pilihan tipe dan daftar **Area Taruh (Tujuan)** dihapus dari menu **Pengaturan > Area** maupun **Form Input**, sehingga pencatatan dan master area hanya menggunakan **Area Sumber** (`type: 'ambil'`).
+- Penyimpanan area di `localStorage` diperbarui ke `rongsok_areas_v2` (dengan migrasi otomatis menyaring data lama agar hanya menyisakan area sumber).
+- Tampilan riwayat, filter laporan, breakdown laporan, ekspor CSV, serta seed area di `supabase_schema.sql` disesuaikan agar hanya menampilkan **Area Sumber**.
+
 ---
 
 ## [Fase 5] - Persiapan PWA Mobile, Skema Database Supabase & Panduan Deploy Vercel (Selesai)
