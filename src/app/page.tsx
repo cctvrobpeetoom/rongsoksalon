@@ -9,16 +9,20 @@ import HistoryList from '@/components/HistoryList';
 import ReportView from '@/components/ReportView';
 import SettingsView from '@/components/SettingsView';
 import LoginView from '@/components/LoginView';
-import { PlusCircle, Clock, BarChart3, Settings } from 'lucide-react';
+import { PlusCircle, Clock, BarChart3, Settings, Sparkles } from 'lucide-react';
 
 export default function Home() {
-  const { currentUser } = useApp();
+  const { currentUser, activeSalon } = useApp();
   const [activeTab, setActiveTab] = useState<'input' | 'riwayat' | 'laporan' | 'pengaturan'>('input');
 
   // If user is not logged in, show the login view
   if (!currentUser) {
     return <LoginView />;
   }
+
+  const salonDisplay = activeSalon.name.toLowerCase().startsWith('salon')
+    ? `Rongsok ${activeSalon.name}`
+    : `Rongsok Salon ${activeSalon.name}`;
 
   const navItems = [
     { id: 'input' as const, label: 'Form Input', icon: PlusCircle },
@@ -58,7 +62,26 @@ export default function Home() {
 
       {/* Main Content Area */}
       <main className="flex-1 max-w-6xl w-full mx-auto p-4 sm:p-6">
-        {activeTab === 'input' && <InputForm />}
+        {activeTab === 'input' && (
+          <>
+            {/* Staff Welcome Greeting Banner */}
+            <div className="w-full max-w-xl mx-auto mb-3.5 bg-white border border-emerald-200/80 rounded-2xl px-4 py-3 shadow-2xs flex items-center gap-3">
+              <div className="w-9 h-9 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-700 shrink-0">
+                <Sparkles className="w-4 h-4" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-sm font-bold text-slate-800 leading-snug">
+                  Hi <span className="text-emerald-700">{currentUser.name}</span>, kamu berada di{' '}
+                  <span className="text-emerald-700">{salonDisplay}</span>
+                </p>
+                <p className="text-[11px] text-slate-500 mt-0.5">
+                  Selamat bertugas! Pastikan cabang salon sudah sesuai sebelum mencatat produk.
+                </p>
+              </div>
+            </div>
+            <InputForm />
+          </>
+        )}
         {activeTab === 'riwayat' && <HistoryList />}
         {activeTab === 'laporan' && <ReportView />}
         {activeTab === 'pengaturan' && <SettingsView />}

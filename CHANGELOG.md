@@ -21,6 +21,9 @@ Dokumen ini mencatat setiap keputusan arsitektur, fase pengerjaan, skema data, d
 - Penambahan produk manual, impor CSV Zenoti, ekspor CSV, tampilan katalog di Pengaturan (`SettingsView.tsx`), dan pencarian produk pada form input (`InputForm.tsx`) hanya membaca dan menulis data milik salon yang sedang aktif (`currentSalonProducts`), dengan kunci penyimpanan `localStorage` versi `rongsok_products_v2`.
 - Skema Supabase (`supabase_schema.sql`) diperbarui dengan kolom `salon_id` pada tabel `public.products` beserta constraint `UNIQUE (salon_id, sku)` dan indeks `idx_products_salon`.
 
+### 5. Salam Sapa Staf di Halaman Awal (`src/app/page.tsx`)
+- Menambahkan banner salam sapa di bagian atas halaman awal setelah login, menampilkan nama staf yang sedang login beserta cabang aktif (contoh: *"Hi Sari, kamu berada di Rongsok Salon Seminyak"*).
+
 ---
 
 ## [Fase 5] - Persiapan PWA Mobile, Skema Database Supabase & Panduan Deploy Vercel (Selesai)
