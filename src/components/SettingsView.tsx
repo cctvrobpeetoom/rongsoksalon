@@ -25,6 +25,9 @@ import {
   AlertCircle,
   Key,
   ShieldCheck,
+  ShieldAlert,
+  AlertTriangle,
+  Lock,
   Phone,
   Home
 } from 'lucide-react';
@@ -38,6 +41,7 @@ export default function SettingsView() {
     addSalon,
     updateSalon,
     deleteSalon,
+    verifySuperAdminPassword,
     currentSalonAreas,
     addArea,
     updateArea,
@@ -105,6 +109,9 @@ export default function SettingsView() {
   const [newSalonAddress, setNewSalonAddress] = useState('');
   const [newSalonPhone, setNewSalonPhone] = useState('');
   const [editingSalon, setEditingSalon] = useState<Salon | null>(null);
+  const [deletingSalon, setDeletingSalon] = useState<Salon | null>(null);
+  const [deletePassword, setDeletePassword] = useState('');
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   // ================= AREA HANDLERS =================
   const handleAddArea = (e: React.FormEvent) => {
@@ -326,6 +333,30 @@ export default function SettingsView() {
     });
     showToast(`Cabang "${editingSalon.name}" berhasil diperbarui`);
     setEditingSalon(null);
+  };
+
+  const handleConfirmDeleteSalon = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!deletingSalon) return;
+
+    if (!deletePassword) {
+      setDeleteError('Silakan masukkan password Super Admin!');
+      return;
+    }
+
+    const isValid = verifySuperAdminPassword(deletePassword);
+    if (!isValid) {
+      setDeleteError('Password salah! Penghapusan cabang dibatalkan demi keamanan.');
+      return;
+    }
+
+    const targetName = deletingSalon.name;
+    const targetId = deletingSalon.id;
+    deleteSalon(targetId);
+    showToast(`Cabang "${targetName}" dan seluruh data terkait berhasil dihapus.`);
+    setDeletingSalon(null);
+    setDeletePassword('');
+    setDeleteError(null);
   };
 
   const ambilAreas = currentSalonAreas.filter((a) => a.type === 'ambil');
@@ -1098,9 +1129,13 @@ export default function SettingsView() {
                   <button
                     type="button"
                     onClick={() => {
-                      if (confirm(`Hapus cabang "${salon.name}"? Data area dan staf terkait akan terpengaruh.`)) {
-                        deleteSalon(salon.id);
+                      if (salons.length <= 1) {
+                        alert('Tidak dapat menghapus cabang terakhir!');
+                        return;
                       }
+                      setDeletingSalon(salon);
+                      setDeletePassword('');
+                      setDeleteError(null);
                     }}
                     className="p-1 text-slate-400 hover:text-red-500"
                     title="Hapus Cabang"
@@ -1159,6 +1194,86 @@ export default function SettingsView() {
                       className="flex-1 py-2 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl"
                     >
                       Simpan
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          )}
+
+          {/* Modal Verifikasi Hapus Cabang Salon */}
+          {deletingSalon && (
+            <div className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-150">
+              <div className="bg-white rounded-3xl p-6 max-w-md w-full shadow-2xl border border-red-100 space-y-4">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-2xl bg-red-50 border border-red-200 flex items-center justify-center text-red-600 shrink-0">
+                    <ShieldAlert className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-bold text-slate-900">
+                      Verifikasi Keamanan: Hapus Cabang
+                    </h3>
+                    <p className="text-xs text-slate-500 mt-0.5">
+                      Tindakan ini permanen. Masukkan password Super Admin untuk konfirmasi.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="p-3.5 bg-red-50/70 border border-red-200 rounded-2xl text-xs text-red-800 space-y-1">
+                  <p className="font-bold flex items-center gap-1.5">
+                    <AlertTriangle className="w-4 h-4 text-red-600 shrink-0" />
+                    Cabang yang akan dihapus: {deletingSalon.name}
+                  </p>
+                  <p className="text-[11px] text-red-700/90 leading-relaxed">
+                    Seluruh data area, staf, katalog produk, dan riwayat transaksi pada cabang ini akan dihapus dari sistem.
+                  </p>
+                </div>
+
+                {deleteError && (
+                  <div className="p-3 bg-red-100/90 border border-red-300 rounded-xl text-red-800 text-xs font-semibold flex items-center gap-2">
+                    <AlertCircle className="w-4 h-4 text-red-600 shrink-0" />
+                    <span>{deleteError}</span>
+                  </div>
+                )}
+
+                <form onSubmit={handleConfirmDeleteSalon} className="space-y-3 pt-1">
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 mb-1 flex items-center gap-1.5">
+                      <Lock className="w-3.5 h-3.5 text-slate-500" />
+                      Password Login Super Admin
+                    </label>
+                    <input
+                      type="password"
+                      placeholder="Masukkan password login Super Admin"
+                      value={deletePassword}
+                      onChange={(e) => {
+                        setDeletePassword(e.target.value);
+                        if (deleteError) setDeleteError(null);
+                      }}
+                      className="w-full text-xs px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 font-medium text-slate-800"
+                      autoFocus
+                      required
+                    />
+                  </div>
+
+                  <div className="flex gap-2 pt-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setDeletingSalon(null);
+                        setDeletePassword('');
+                        setDeleteError(null);
+                      }}
+                      className="flex-1 py-2.5 text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors"
+                    >
+                      Batal
+                    </button>
+                    <button
+                      type="submit"
+                      className="flex-1 py-2.5 text-xs font-bold text-white bg-red-600 hover:bg-red-700 active:scale-95 rounded-xl transition-all shadow-md shadow-red-600/20 flex items-center justify-center gap-1.5"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                      Konfirmasi Hapus
                     </button>
                   </div>
                 </form>

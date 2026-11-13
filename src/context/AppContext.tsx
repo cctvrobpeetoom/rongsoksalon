@@ -21,6 +21,7 @@ interface AppContextType {
   addSalon: (name: string, address?: string, phone?: string) => void;
   updateSalon: (id: string, data: Partial<Omit<Salon, 'id'>>) => void;
   deleteSalon: (id: string) => void;
+  verifySuperAdminPassword: (password: string) => boolean;
 
   areas: Area[];
   currentSalonAreas: Area[];
@@ -253,10 +254,21 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       return;
     }
     setSalons((prev) => prev.filter((s) => s.id !== id));
+    setAreas((prev) => prev.filter((a) => a.salonId !== id));
+    setStaffList((prev) => prev.filter((s) => s.salonId !== id));
+    setProducts((prev) => prev.filter((p) => p.salonId !== id));
+    setTransactions((prev) => prev.filter((t) => t.salonId !== id));
+
     if (activeSalonId === id) {
       const remaining = salons.filter((s) => s.id !== id);
       if (remaining.length > 0) setActiveSalonIdState(remaining[0].id);
     }
+  };
+
+  const verifySuperAdminPassword = (password: string): boolean => {
+    const trimmed = password.trim();
+    if (!trimmed) return false;
+    return INITIAL_USERS.some((u) => u.role === 'superadmin' && u.pin === trimmed);
   };
 
   // Filtered lists per current salon (Strict database isolation per salon)
@@ -408,6 +420,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         addSalon,
         updateSalon,
         deleteSalon,
+        verifySuperAdminPassword,
         areas,
         currentSalonAreas,
         addArea,

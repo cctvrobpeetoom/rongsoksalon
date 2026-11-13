@@ -4,6 +4,19 @@ Dokumen ini mencatat setiap keputusan arsitektur, fase pengerjaan, skema data, d
 
 ---
 
+## [Revisi] - Pembaruan Footer Login & Verifikasi Password Penghapusan Salon
+*Tanggal: 13 November 2026*
+
+### 1. Pembaruan Footer Halaman Login (`src/components/LoginView.tsx`)
+- Teks hak cipta di bagian bawah halaman login diperbarui menjadi: **"RongsokSalon by Agusta Sigit © 2026"**.
+
+### 2. Verifikasi Password Super Admin Saat Menghapus Cabang Salon (`src/components/SettingsView.tsx`, `src/context/AppContext.tsx`)
+- Menambahkan modal dialog verifikasi keamanan saat Super Admin menekan tombol hapus cabang salon.
+- Super Admin wajib memasukkan password login Super Admin (`Petitenget16` atau `sigitlapar`) untuk mengonfirmasi penghapusan. Hal ini mencegah salah klik yang tidak disengaja dan menjaga keamanan database cabang salon.
+- Seluruh data area, staf, katalog produk, dan transaksi terkait cabang tersebut dibersihkan secara aman saat konfirmasi berhasil.
+
+---
+
 ## [Revisi] - Penghapusan Bantuan Login Uji Coba, Dropdown Jabatan, Placeholder Bersih & Isolasi Database Produk Per Salon
 *Tanggal: 12 November 2026*
 

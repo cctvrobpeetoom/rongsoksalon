@@ -129,7 +129,7 @@ export default function LoginView() {
         </div>
 
         <p className="text-center text-[11px] text-slate-400 mt-6">
-          RongsokSalon Multi-Tenant © 2026 • 7 Cabang Salon
+          RongsokSalon by Agusta Sigit © 2026
         </p>
       </div>
     </div>
