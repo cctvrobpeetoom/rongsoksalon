@@ -6,8 +6,12 @@
 
 import { Salon, Area, Staff, Product, RongsokTransaction } from '@/types';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim() || '';
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.trim() || '';
+// Default Supabase credentials fallback jika Vercel environment variables belum dibake
+const DEFAULT_SUPABASE_URL = 'https://xwovjverhisgkfhbgalv.supabase.co';
+const DEFAULT_SUPABASE_ANON_KEY = 'sb_publishable_w0uQqxXeRRS1sKBlc57QMA_z81YGNzK';
+
+const supabaseUrl = (process.env.NEXT_PUBLIC_SUPABASE_URL?.trim()) || DEFAULT_SUPABASE_URL;
+const supabaseAnonKey = (process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.trim()) || DEFAULT_SUPABASE_ANON_KEY;
 
 export const isSupabaseConfigured = Boolean(
   supabaseUrl &&
