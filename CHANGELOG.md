@@ -4,6 +4,24 @@ Dokumen ini mencatat setiap keputusan arsitektur, fase pengerjaan, skema data, d
 
 ---
 
+## [Pembaruan] - Sinkronisasi 6 Cabang Resmi & Integrasi Real-Time Cloud Database Supabase
+*Tanggal: 14 November 2026*
+
+### 1. Sinkronisasi Data Bawaan 6 Cabang Resmi (`src/data/initialData.ts`, `supabase_schema.sql`, `AppContext.tsx`)
+- Memperbarui data bawaan (`INITIAL_SALONS`) dengan 6 cabang resmi (Seminyak, Canggu, Ubud, Salon Icon Sanur, Salon Surabaya, Salon Uluwatu) beserta alamat dan nomor telepon terkininya.
+- Menghapus data cabang Jimbaran dari daftar bawaan awal.
+- Memperbarui kunci penyimpanan lokal ke `rongsok_salons_v2` sehingga seluruh browser (Google Chrome, Safari di HP, Antigravity) langsung memuat 6 cabang resmi ini tanpa menampilkan 7 cabang lama.
+
+### 2. Integrasi Penuh Cloud Database Supabase Real-Time (`src/lib/supabase.ts`, `src/context/AppContext.tsx`)
+- Menghubungkan aplikasi ke cloud PostgreSQL Supabase secara langsung via REST API (tanpa dependensi paket eksternal agar kompatibel di semua browser dan mobile).
+- Sinkronisasi otomatis dua arah:
+  - Memuat data cabang, area, staf, katalog produk, dan transaksi dari database Supabase saat aplikasi dibuka.
+  - Polling berkala (setiap 12 detik dan saat tab browser kembali aktif) agar transaksi yang dicatat staf di satu perangkat langsung muncul di perangkat staf / manajer lain secara real-time.
+  - Setiap penambahan, pembaruan, dan penghapusan data langsung disimpan ke Supabase Cloud.
+- Menambahkan indikator status koneksi database di Navbar dan Pengaturan (`Cloud Realtime` vs `Lokal Offline`) serta tombol sinkronisasi manual.
+
+---
+
 ## [Revisi] - Pembaruan Footer Login & Verifikasi Password Penghapusan Salon
 *Tanggal: 13 November 2026*
 

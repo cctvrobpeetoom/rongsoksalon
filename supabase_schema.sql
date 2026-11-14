@@ -79,17 +79,19 @@ CREATE INDEX IF NOT EXISTS idx_areas_salon ON public.areas(salon_id);
 CREATE INDEX IF NOT EXISTS idx_staff_salon ON public.staff(salon_id);
 
 -- ==============================================================
--- 8. DATA AWAL (SEED DATA: 7 SALON, AREA, & STAF AWAL)
+-- 8. DATA AWAL (SEED DATA: 6 SALON RESMI, AREA SUMBER, & STAF)
 -- ==============================================================
-INSERT INTO public.salons (id, name, address, is_active) VALUES
-('seminyak', 'Salon Seminyak', 'Jl. Kayu Aya No. 8, Seminyak', true),
-('canggu', 'Salon Canggu', 'Jl. Pantai Batu Bolong No. 12, Canggu', true),
-('ubud', 'Salon Ubud', 'Jl. Monkey Forest No. 45, Ubud', true),
-('sanur', 'Salon Sanur', 'Jl. Danau Tamblingan No. 18, Sanur', true),
-('kuta', 'Salon Kuta', 'Jl. Raya Kuta No. 88, Kuta', true),
-('jimbaran', 'Salon Jimbaran', 'Jl. Uluwatu No. 22, Jimbaran', true),
-('uluwatu', 'Salon Uluwatu', 'Jl. Labuansait No. 5, Pecatu', true)
-ON CONFLICT (id) DO NOTHING;
+INSERT INTO public.salons (id, name, address, phone, is_active) VALUES
+('seminyak', 'Salon Seminyak', 'Petitenget St No.16, Seminyak, Kuta Utara, Badung Regency, Bali 80631', '08113875688', true),
+('canggu', 'Salon Canggu', 'Jl. Canggu Padang Linjong No.101, Canggu, Kec. Kuta Utara, Kabupaten Badung, Bali 80361', '082342494890', true),
+('ubud', 'Salon Ubud', 'Jl. Raya Sanggingan No.88, Kedewatan, Kecamatan Ubud, Kabupaten Gianyar, Bali 80571', '08113875699', true),
+('sanur', 'Salon Icon Sanur', 'Jl. Danau Tamblingan No.27, Sanur, Denpasar Selatan, Kota Denpasar, Bali 80228', '081138777654', true),
+('kuta', 'Salon Surabaya', 'Surabaya', NULL, true),
+('uluwatu', 'Salon Uluwatu', 'Uluwatu', NULL, true)
+ON CONFLICT (id) DO UPDATE SET
+  name = EXCLUDED.name,
+  address = EXCLUDED.address,
+  phone = EXCLUDED.phone;
 
 -- Area Seminyak (Sumber saja)
 INSERT INTO public.areas (id, salon_id, name, type) VALUES

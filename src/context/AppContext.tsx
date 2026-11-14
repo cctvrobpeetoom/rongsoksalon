@@ -10,6 +10,25 @@ import {
   INITIAL_PRODUCTS,
   INITIAL_TRANSACTIONS,
 } from '@/data/initialData';
+import {
+  isSupabaseConfigured,
+  fetchSalonsFromCloud,
+  upsertSalonToCloud,
+  deleteSalonFromCloud,
+  fetchAreasFromCloud,
+  upsertAreaToCloud,
+  deleteAreaFromCloud,
+  fetchStaffFromCloud,
+  upsertStaffToCloud,
+  deleteStaffFromCloud,
+  fetchProductsFromCloud,
+  upsertProductToCloud,
+  upsertBulkProductsToCloud,
+  deleteProductFromCloud,
+  fetchTransactionsFromCloud,
+  insertTransactionToCloud,
+  deleteTransactionFromCloud,
+} from '@/lib/supabase';
 
 interface AppContextType {
   currentUser: User | null;
@@ -46,6 +65,10 @@ interface AppContextType {
   currentSalonTransactions: RongsokTransaction[];
   addTransaction: (data: Omit<RongsokTransaction, 'id' | 'createdAt'>) => void;
   deleteTransaction: (id: string) => void;
+
+  isCloudConnected: boolean;
+  lastSyncedTime: Date | null;
+  syncWithCloud: () => Promise<void>;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -59,6 +82,58 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [products, setProducts] = useState<Product[]>(INITIAL_PRODUCTS);
   const [transactions, setTransactions] = useState<RongsokTransaction[]>(INITIAL_TRANSACTIONS);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [isCloudConnected, setIsCloudConnected] = useState<boolean>(isSupabaseConfigured);
+  const [lastSyncedTime, setLastSyncedTime] = useState<Date | null>(null);
+
+  // Cloud Database Sync function
+  const syncWithCloud = async () => {
+    if (!isSupabaseConfigured) return;
+    try {
+      const [cloudSalons, cloudAreas, cloudStaff, cloudProducts, cloudTrx] = await Promise.all([
+        fetchSalonsFromCloud(),
+        fetchAreasFromCloud(),
+        fetchStaffFromCloud(),
+        fetchProductsFromCloud(),
+        fetchTransactionsFromCloud(),
+      ]);
+
+      if (cloudSalons && cloudSalons.length > 0) {
+        setSalons(cloudSalons);
+        localStorage.setItem('rongsok_salons_v2', JSON.stringify(cloudSalons));
+      } else if (cloudSalons && cloudSalons.length === 0) {
+        INITIAL_SALONS.forEach((s) => upsertSalonToCloud(s));
+      }
+
+      if (cloudAreas && cloudAreas.length > 0) {
+        setAreas(cloudAreas);
+        localStorage.setItem('rongsok_areas_v2', JSON.stringify(cloudAreas));
+      } else if (cloudAreas && cloudAreas.length === 0) {
+        INITIAL_AREAS.forEach((a) => upsertAreaToCloud(a));
+      }
+
+      if (cloudStaff && cloudStaff.length > 0) {
+        setStaffList(cloudStaff);
+        localStorage.setItem('rongsok_staff_v2', JSON.stringify(cloudStaff));
+      }
+
+      if (cloudProducts && cloudProducts.length > 0) {
+        setProducts(cloudProducts);
+        localStorage.setItem('rongsok_products_v2', JSON.stringify(cloudProducts));
+      } else if (cloudProducts && cloudProducts.length === 0) {
+        upsertBulkProductsToCloud(INITIAL_PRODUCTS);
+      }
+
+      if (cloudTrx) {
+        setTransactions(cloudTrx);
+        localStorage.setItem('rongsok_transactions', JSON.stringify(cloudTrx));
+      }
+
+      setIsCloudConnected(true);
+      setLastSyncedTime(new Date());
+    } catch (e) {
+      console.warn('Sync with cloud encountered an issue:', e);
+    }
+  };
 
   // Load from LocalStorage if available
   useEffect(() => {
@@ -72,8 +147,14 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         }
       }
 
-      const savedSalons = localStorage.getItem('rongsok_salons');
-      if (savedSalons) setSalons(JSON.parse(savedSalons));
+      localStorage.removeItem('rongsok_salons');
+      const savedSalonsV2 = localStorage.getItem('rongsok_salons_v2');
+      if (savedSalonsV2) {
+        setSalons(JSON.parse(savedSalonsV2));
+      } else {
+        setSalons(INITIAL_SALONS);
+        localStorage.setItem('rongsok_salons_v2', JSON.stringify(INITIAL_SALONS));
+      }
 
       const savedSalonId = localStorage.getItem('rongsok_active_salon');
       if (savedSalonId) setActiveSalonIdState(savedSalonId);
@@ -103,6 +184,29 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
+  // Background Realtime Sync Polling & Focus Listener
+  useEffect(() => {
+    if (!isSupabaseConfigured) return;
+
+    // Initial sync
+    syncWithCloud();
+
+    // Periodic sync every 12 seconds so all mobile devices stay in sync
+    const interval = setInterval(() => {
+      syncWithCloud();
+    }, 12000);
+
+    const handleFocus = () => {
+      syncWithCloud();
+    };
+    window.addEventListener('focus', handleFocus);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('focus', handleFocus);
+    };
+  }, []);
+
   // Save to LocalStorage whenever data changes
   useEffect(() => {
     if (!isLoaded) return;
@@ -112,7 +216,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       } else {
         localStorage.removeItem('rongsok_user');
       }
-      localStorage.setItem('rongsok_salons', JSON.stringify(salons));
+      localStorage.setItem('rongsok_salons_v2', JSON.stringify(salons));
       localStorage.setItem('rongsok_active_salon', activeSalonId);
       localStorage.setItem('rongsok_areas_v2', JSON.stringify(areas));
       localStorage.setItem('rongsok_staff_v2', JSON.stringify(staffList));
@@ -242,10 +346,16 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       isActive: true,
     };
     setSalons((prev) => [...prev, newSalon]);
+    if (isSupabaseConfigured) upsertSalonToCloud(newSalon);
   };
 
   const updateSalon = (id: string, data: Partial<Omit<Salon, 'id'>>) => {
-    setSalons((prev) => prev.map((s) => (s.id === id ? { ...s, ...data } : s)));
+    setSalons((prev) => {
+      const updated = prev.map((s) => (s.id === id ? { ...s, ...data } : s));
+      const target = updated.find((s) => s.id === id);
+      if (target && isSupabaseConfigured) upsertSalonToCloud(target);
+      return updated;
+    });
   };
 
   const deleteSalon = (id: string) => {
@@ -263,6 +373,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       const remaining = salons.filter((s) => s.id !== id);
       if (remaining.length > 0) setActiveSalonIdState(remaining[0].id);
     }
+    if (isSupabaseConfigured) deleteSalonFromCloud(id);
   };
 
   const verifySuperAdminPassword = (password: string): boolean => {
@@ -286,14 +397,21 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       type,
     };
     setAreas((prev) => [...prev, newArea]);
+    if (isSupabaseConfigured) upsertAreaToCloud(newArea);
   };
 
   const updateArea = (id: string, name: string, type: 'ambil' | 'taruh') => {
-    setAreas((prev) => prev.map((a) => (a.id === id ? { ...a, name, type } : a)));
+    setAreas((prev) => {
+      const updated = prev.map((a) => (a.id === id ? { ...a, name, type } : a));
+      const target = updated.find((a) => a.id === id);
+      if (target && isSupabaseConfigured) upsertAreaToCloud(target);
+      return updated;
+    });
   };
 
   const deleteArea = (id: string) => {
     setAreas((prev) => prev.filter((a) => a.id !== id));
+    if (isSupabaseConfigured) deleteAreaFromCloud(id);
   };
 
   // Staff CRUD
@@ -308,14 +426,21 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       isActive: true,
     };
     setStaffList((prev) => [...prev, newStaff]);
+    if (isSupabaseConfigured) upsertStaffToCloud(newStaff);
   };
 
   const updateStaff = (id: string, data: Partial<Omit<Staff, 'id' | 'salonId'>>) => {
-    setStaffList((prev) => prev.map((s) => (s.id === id ? { ...s, ...data } : s)));
+    setStaffList((prev) => {
+      const updated = prev.map((s) => (s.id === id ? { ...s, ...data } : s));
+      const target = updated.find((s) => s.id === id);
+      if (target && isSupabaseConfigured) upsertStaffToCloud(target);
+      return updated;
+    });
   };
 
   const deleteStaff = (id: string) => {
     setStaffList((prev) => prev.filter((s) => s.id !== id));
+    if (isSupabaseConfigured) deleteStaffFromCloud(id);
   };
 
   // Product CRUD & Bulk Import (Strict salonId isolation & SKU deduplication per salon)
@@ -326,12 +451,13 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     );
 
     if (existingIndex >= 0) {
-      // Update existing inside the same salon
-      setProducts((prev) =>
-        prev.map((p, idx) =>
+      setProducts((prev) => {
+        const updated = prev.map((p, idx) =>
           idx === existingIndex ? { ...p, ...productData, sku: cleanSku, salonId: activeSalonId } : p
-        )
-      );
+        );
+        if (isSupabaseConfigured) upsertProductToCloud(updated[existingIndex]);
+        return updated;
+      });
     } else {
       const newProduct: Product = {
         ...productData,
@@ -340,22 +466,28 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         id: `prd-${activeSalonId}-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
       };
       setProducts((prev) => [newProduct, ...prev]);
+      if (isSupabaseConfigured) upsertProductToCloud(newProduct);
     }
   };
 
   const updateProduct = (id: string, data: Partial<Omit<Product, 'id' | 'salonId'>>) => {
-    setProducts((prev) =>
-      prev.map((p) => (p.id === id ? { ...p, ...data, sku: data.sku ? data.sku.toUpperCase() : p.sku } : p))
-    );
+    setProducts((prev) => {
+      const updated = prev.map((p) => (p.id === id ? { ...p, ...data, sku: data.sku ? data.sku.toUpperCase() : p.sku } : p));
+      const target = updated.find((p) => p.id === id);
+      if (target && isSupabaseConfigured) upsertProductToCloud(target);
+      return updated;
+    });
   };
 
   const deleteProduct = (id: string) => {
     setProducts((prev) => prev.filter((p) => p.id !== id));
+    if (isSupabaseConfigured) deleteProductFromCloud(id);
   };
 
   const importProducts = (newProducts: Omit<Product, 'id' | 'salonId'>[]) => {
     let addedCount = 0;
     let updatedCount = 0;
+    const itemsToUpsert: Product[] = [];
 
     setProducts((prev) => {
       const map = new Map<string, Product>();
@@ -368,28 +500,36 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         const key = `${activeSalonId}::${cleanSku}`;
         if (map.has(key)) {
           const existing = map.get(key)!;
-          map.set(key, {
+          const updated: Product = {
             ...existing,
             name: np.name.trim(),
             category: np.category.trim() || existing.category,
             unit: np.unit.trim() || existing.unit,
-          });
+          };
+          map.set(key, updated);
+          itemsToUpsert.push(updated);
           updatedCount++;
         } else {
-          map.set(key, {
+          const newP: Product = {
             id: `prd-${activeSalonId}-imp-${Date.now()}-${idx}`,
             salonId: activeSalonId,
             sku: cleanSku,
             name: np.name.trim(),
             category: np.category.trim() || 'General',
             unit: np.unit.trim() || 'Pcs',
-          });
+          };
+          map.set(key, newP);
+          itemsToUpsert.push(newP);
           addedCount++;
         }
       });
 
       return Array.from(map.values());
     });
+
+    if (isSupabaseConfigured && itemsToUpsert.length > 0) {
+      upsertBulkProductsToCloud(itemsToUpsert);
+    }
 
     return { addedCount, updatedCount };
   };
@@ -402,10 +542,12 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       createdAt: new Date().toISOString(),
     };
     setTransactions((prev) => [newTrx, ...prev]);
+    if (isSupabaseConfigured) insertTransactionToCloud(newTrx);
   };
 
   const deleteTransaction = (id: string) => {
     setTransactions((prev) => prev.filter((t) => t.id !== id));
+    if (isSupabaseConfigured) deleteTransactionFromCloud(id);
   };
 
   return (
@@ -441,6 +583,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         currentSalonTransactions,
         addTransaction,
         deleteTransaction,
+        isCloudConnected,
+        lastSyncedTime,
+        syncWithCloud,
       }}
     >
       {children}

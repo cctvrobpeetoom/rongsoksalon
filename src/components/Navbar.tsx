@@ -5,7 +5,7 @@ import { useApp } from '@/context/AppContext';
 import { Scissors, MapPin, ChevronDown, Building2, LogOut, Lock } from 'lucide-react';
 
 export default function Navbar() {
-  const { salons, activeSalon, setActiveSalonId, currentUser, logout } = useApp();
+  const { salons, activeSalon, setActiveSalonId, currentUser, logout, isCloudConnected } = useApp();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   // Is user a Super Admin? (Only Super Admin can switch salons)
@@ -27,6 +27,23 @@ export default function Navbar() {
               <span className="text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.2 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
                 Audit
               </span>
+              {isCloudConnected ? (
+                <span
+                  className="hidden sm:inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.2 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200"
+                  title="Database Cloud Supabase Terhubung (Sinkronisasi Realtime)"
+                >
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                  Cloud Realtime
+                </span>
+              ) : (
+                <span
+                  className="hidden sm:inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.2 rounded-full bg-amber-50 text-amber-700 border border-amber-200"
+                  title="Supabase belum aktif di Vercel, data tersimpan di memori perangkat ini"
+                >
+                  <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+                  Lokal (Offline)
+                </span>
+              )}
             </div>
             <p className="text-[10px] text-slate-400 font-medium hidden sm:block">
               Pencatatan Produk Habis & Sinkronisasi Zenoti

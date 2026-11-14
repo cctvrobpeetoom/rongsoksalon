@@ -6,13 +6,46 @@ export const INITIAL_USERS: (User & { pin: string })[] = [
 ];
 
 export const INITIAL_SALONS: Salon[] = [
-  { id: 'seminyak', name: 'Salon Seminyak', address: 'Jl. Kayu Aya No. 8, Seminyak', isActive: true },
-  { id: 'canggu', name: 'Salon Canggu', address: 'Jl. Pantai Batu Bolong No. 12, Canggu', isActive: true },
-  { id: 'ubud', name: 'Salon Ubud', address: 'Jl. Monkey Forest No. 45, Ubud', isActive: true },
-  { id: 'sanur', name: 'Salon Sanur', address: 'Jl. Danau Tamblingan No. 18, Sanur', isActive: true },
-  { id: 'kuta', name: 'Salon Kuta', address: 'Jl. Raya Kuta No. 88, Kuta', isActive: true },
-  { id: 'jimbaran', name: 'Salon Jimbaran', address: 'Jl. Uluwatu No. 22, Jimbaran', isActive: true },
-  { id: 'uluwatu', name: 'Salon Uluwatu', address: 'Jl. Labuansait No. 5, Pecatu', isActive: true },
+  {
+    id: 'seminyak',
+    name: 'Salon Seminyak',
+    address: 'Petitenget St No.16, Seminyak, Kuta Utara, Badung Regency, Bali 80631',
+    phone: '08113875688',
+    isActive: true,
+  },
+  {
+    id: 'canggu',
+    name: 'Salon Canggu',
+    address: 'Jl. Canggu Padang Linjong No.101, Canggu, Kec. Kuta Utara, Kabupaten Badung, Bali 80361',
+    phone: '082342494890',
+    isActive: true,
+  },
+  {
+    id: 'ubud',
+    name: 'Salon Ubud',
+    address: 'Jl. Raya Sanggingan No.88, Kedewatan, Kecamatan Ubud, Kabupaten Gianyar, Bali 80571',
+    phone: '08113875699',
+    isActive: true,
+  },
+  {
+    id: 'sanur',
+    name: 'Salon Icon Sanur',
+    address: 'Jl. Danau Tamblingan No.27, Sanur, Denpasar Selatan, Kota Denpasar, Bali 80228',
+    phone: '081138777654',
+    isActive: true,
+  },
+  {
+    id: 'kuta',
+    name: 'Salon Surabaya',
+    address: 'Surabaya',
+    isActive: true,
+  },
+  {
+    id: 'uluwatu',
+    name: 'Salon Uluwatu',
+    address: 'Uluwatu',
+    isActive: true,
+  },
 ];
 
 export const INITIAL_AREAS: Area[] = [
@@ -30,11 +63,8 @@ export const INITIAL_AREAS: Area[] = [
   // Sanur (Sumber saja)
   { id: 'snr-amb-1', salonId: 'sanur', name: 'Gudang Sentral', type: 'ambil' },
 
-  // Kuta (Sumber saja)
+  // Kuta / Surabaya (Sumber saja)
   { id: 'kta-amb-1', salonId: 'kuta', name: 'Gudang Produk', type: 'ambil' },
-
-  // Jimbaran (Sumber saja)
-  { id: 'jmb-amb-1', salonId: 'jimbaran', name: 'Gudang Stock', type: 'ambil' },
 
   // Uluwatu (Sumber saja)
   { id: 'ulw-amb-1', salonId: 'uluwatu', name: 'Gudang Depan', type: 'ambil' },
