@@ -119,3 +119,15 @@ INSERT INTO public.products (id, salon_id, sku, name, category, unit) VALUES
 ('prd-cng-003', 'canggu', 'MKR-TEX-SPA-1000', 'Makarizo Texture Experience Hair Spa Strawberry 1000g', 'Hair Spa Cream', 'Jar'),
 ('prd-cng-004', 'canggu', 'BRB-SUV-ORG-113', 'Suavecito Original Hold Pomade 113g', 'Barber Pomade', 'Jar')
 ON CONFLICT (salon_id, sku) DO NOTHING;
+
+-- ==============================================================
+-- 9. IZIN AKSES (ROW LEVEL SECURITY / RLS)
+-- Jalankan bagian ini agar aplikasi web dapat membaca & menulis
+-- data tanpa terhalang error "violates row-level security policy"
+-- ==============================================================
+ALTER TABLE public.salons DISABLE ROW LEVEL SECURITY;
+ALTER TABLE public.areas DISABLE ROW LEVEL SECURITY;
+ALTER TABLE public.staff DISABLE ROW LEVEL SECURITY;
+ALTER TABLE public.products DISABLE ROW LEVEL SECURITY;
+ALTER TABLE public.transactions DISABLE ROW LEVEL SECURITY;
+
